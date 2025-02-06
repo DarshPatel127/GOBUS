@@ -1,0 +1,29 @@
+{% extends "exp/base.html" %}
+{% block content %}
+
+<form action ="{% url 'search_results' %}" method="GET" >
+    <div id="searchButton">
+        <input class="from" type="search" value="{{ from_query }}" name="from" placeholder="From">
+        <input class="to" type="search"  value="{{ to_query }}" name="to" placeholder="To">
+        <button class="search" type="submit">Search</button>
+    </div>
+</form>
+
+      {% for bus in required_buses %}
+              <article class="media content-section">
+              <div class="media-body">
+                <div class="article-metadata">
+                  <a class="mr-2" href="#">{{bus.bus_name }}</a>
+                  <small class="text-muted">{{ bus.bus_number }}</small>
+                </div>
+                <h2><a class="article-title" href="#">from {{bus.depart_from}} to {{bus.stop1}}</a></h2>
+                <p class="article-content">Date: {{ bus.date }}</p>
+                <p class="article-content">Time: {{ bus.time }}</p>
+                <p class="article-content">Fare: {{ bus.fare }}</p>
+                  <a  class="chutiyaBtn">Book</a>
+              </div>
+            </article>
+        {% endfor %}
+
+{% endblock%}
+

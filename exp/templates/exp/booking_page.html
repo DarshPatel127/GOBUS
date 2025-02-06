@@ -1,0 +1,10 @@
+{% extends "exp/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+ <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}  {# Use crispy to format the form #}
+
+    <button type="submit" class="btn btn-primary">Confirm Booking</button>
+</form>
+{% endblock content %}

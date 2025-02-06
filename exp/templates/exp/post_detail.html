@@ -1,0 +1,15 @@
+{% extends "exp/base.html" %}
+{% block content %}
+            <article class="media content-section">
+              <div class="media-body">
+                <div class="article-metadata">
+                  <a class="mr-2" href="#">{{object.name }}</a>
+                  <small class="text-muted">{{ object.date | date:"F d,Y" }}</small>
+                </div>
+                <h2 class="article-title" href="#">EXPENSE</h2>
+                <p class="article-content">Clothes: {{ expense.clothes }}</p>
+                <p class="article-content">Shoes: {{ expense.shoes  }}</p>
+                <p class="article-content">Books: {{ expense.books }}</p>
+              </div>
+            </article>
+{% endblock content %}
