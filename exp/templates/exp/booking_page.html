@@ -3,7 +3,7 @@
 {% block content %}
  <form method="post">
     {% csrf_token %}
-    {{ form|crispy }}  {# Use crispy to format the form #}
+    {{ form|crispy }}
 
     <button type="submit" class="btn btn-primary">Confirm Booking</button>
 </form>

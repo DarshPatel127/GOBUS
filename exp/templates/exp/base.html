@@ -1,4 +1,5 @@
 {% load static%}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,13 +29,14 @@
         <!-- Navbar Right Side -->
         <div class="navbar-nav">
             {% if user.is_authenticated %}
-            <form action="{% url 'logout' %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-light">Logout</button>
-            </form>
+               <a class="nav-item nav-link" href="{% url 'account_logout' %}">Logout</a>
+
+
             <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+            <a class="nav-item nav-link" href="{% url 'view_bookings' %}">View Bookings</a>
             {% else %}
-               <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
+               {% load socialaccount %}
+               <a class="nav-item nav-link" href="{% provider_login_url 'google' %}">Login with Google</a>
                <a class="nav-item nav-link" href="{% url 'register' %}">Register</a>
             {% endif %}
         </div>

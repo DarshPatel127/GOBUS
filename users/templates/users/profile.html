@@ -31,5 +31,9 @@
                {{ add_funds_form|crispy }}
                <button type="submit" name="add_funds" class="btn btn-success">Add Funds</button>
           </form>
+        {% if not user.profile.email_verified %}
+            <p>Your email is not verified. Click the button below to send an OTP to your email.</p>
+            <a href="{% url 'send_otp' %}" class="btn btn-info">Send OTP</a>
+        {% endif %}
     </div>
 {% endblock content %}

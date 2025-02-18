@@ -1,0 +1,20 @@
+{% extends "exp/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="mt-5">
+    <h2>Edit Passenger Details</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    {{ form|crispy }}
+                </div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Update Passenger Details</button>
+    </form>
+</div>
+{% endblock %}

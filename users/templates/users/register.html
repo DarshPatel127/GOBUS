@@ -1,23 +1,15 @@
 {% extends "exp/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class = 'content-section'>
-      <form method="post">
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Register</h2>
+    <form method="post" class="card p-4 shadow-sm">
         {% csrf_token %}
-        <fieldset class="form-group">
-          <legend class="border-bottom mb-4">NEW USER</legend>
-          {{form | crispy }}
-        </fieldset>
-        <fieldset class="form-group">}}
-        </fieldset>
-        <div class="form-group">
-          <button class = "btn btn-outline-info" type="submit"> SIGN UP !!!</button>
-        </div>
-      </form>
-      <div class ="border-top pt-3">
-        <small class = "text muted">
-          Already have an account ? <a class="ml-2" href="{% url 'login' %}">SIGN IN</a>
-        </small>
-      </div>
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-outline-info w-100">Sign Up</button>
+    </form>
+    <div class="text-center mt-3">
+        <p>Already have an account? <a href="{% url 'account_login' %}">Sign In</a></p>
     </div>
-{% endblock content %}
+</div>
+{% endblock %}

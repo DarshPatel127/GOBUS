@@ -1,0 +1,21 @@
+{% extends "exp/base.html" %}
+{% block content %}
+       {% for booked_ticket  in booked_tickets %}
+              <article class="media content-section">
+              <div class="media-body">
+                <div class="article-metadata">
+                  <a class="mr-2" href="#">{{booked_ticket.bus.bus_name }}</a>
+                  <small class="text-muted">{{ booked_ticket.bus_number }}</small>
+                </div>
+                <h2><a class="article-title" href="#">from {{booked_ticket.bus.depart_from}} to {{booked_ticket.bus.stop1}}</a></h2>
+                <p class="article-content">Date & Time: {{ booked_ticket.bus.date_time }}</p>
+                <p class="article-content">Number of seats: {{ booked_ticket.no_of_seats }}</p>
+                  <p class="article-content">Cancellation status: {{ booked_ticket.is_cancelled }}</p>
+                  {% if not booked_ticket.is_cancelled %}
+                     <a href = "{% url 'cancel_booking' booked_ticket.id %}" class="chutiyaBtn">Cancel</a>
+                  {% endif %}
+                  <a class="chutiyaBtn" href="{% url 'edit_passengers' booked_ticket.id %}">Edit Passenger Details</a>
+              </div>
+            </article>
+       {% endfor %}
+{% endblock %}
