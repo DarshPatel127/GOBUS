@@ -37,20 +37,39 @@ class busdetails(models.Model):
     #     return f' {self.bus_name}'
 
 
+class BusStop(models.Model):
+    bus = models.ForeignKey(busdetails, on_delete=models.CASCADE, related_name='stops')
+    stop_name = models.CharField(max_length=50)
+    stop_number = models.PositiveIntegerField()  # the main order of the stops
+    arrival_time = models.DateTimeField()
+    fare_from_start = models.IntegerField()  # cummulative fare instead of indivisual fare ig
+
+    class Meta:
+        ordering = ['stop_number']
+        unique_together = ['bus', 'stop_number']
+
+    def __str__(self):
+        return f"{self.bus.bus_name} - Stop {self.stop_number}:{self.stop_name}"
+
+
 class Booking(models.Model):
     name = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     no_of_seats = models.IntegerField()
     bus = models.ForeignKey(busdetails, on_delete=models.CASCADE)
+    source_stop = models.ForeignKey(BusStop, on_delete=models.CASCADE, related_name='bookings_from', null=True)
+    destination_stop = models.ForeignKey(BusStop, on_delete=models.CASCADE, related_name='bookings_to',null=True)
     is_cancelled = models.BooleanField(default=False)
 
     @property
     def email(self):
         return self.name.email
 
+    def calculate_far(self):
+        return self.destination_stop.fare_from_start - self.source_stop.fare_from_start
+
     def __str__(self):
         return f'{self.name} has booked {self.no_of_seats}seats in bus:{self.bus} on {self.date} '
-
 
 class Passenger(models.Model):
     Genders = (

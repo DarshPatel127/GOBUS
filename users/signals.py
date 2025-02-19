@@ -12,7 +12,7 @@ def create_profile(sender, instance, created, **kwargs):
 
 def save_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)  # Create profile if it doesn't exist
+        Profile.objects.create(user=instance)
     else:
         instance.profile.save()
 
@@ -23,6 +23,6 @@ def create_wallet(sender, instance, created, **kwargs):
 
 def save_wallet(sender, instance, created, **kwargs):
     if created:
-        Wallet.objects.create(user=instance)  # Create profile if it doesn't exist
+        Wallet.objects.create(user=instance)
     else:
         instance.wallet.save()

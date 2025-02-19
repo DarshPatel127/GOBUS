@@ -1,19 +1,22 @@
 {% extends "exp/base.html" %}
 {% block content %}
-<h2>Search Results FOR "{{ from_query }} TO {{to_query}}"</h2>
+<h2>Search Results for "{{ from_query }} to {{ to_query }}"</h2>
 
-       {% for bus in required_buses %}
-              <article class="media content-section">
-              <div class="media-body">
-                <div class="article-metadata">
-                  <a class="mr-2" href="#">{{bus.bus_name }}</a>
-                  <small class="text-muted">{{ bus.bus_number }}</small>
-                </div>
-                <h2><a class="article-title" href="#">from {{bus.depart_from}} to {{bus.stop1}}</a></h2>
-                <p class="article-content">Date: {{ bus.date_time }}</p>
-                <p class="article-content">Fare: {{ bus.fare }}</p>
-                <a href = "{% url 'booking_page' bus.id %}" class="chutiyaBtn">Book</a>
-              </div>
-            </article>
-        {% endfor %}
+{% for bus_info in available_buses %}
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ bus_info.bus.bus_name }}</a>
+                <small class="text-muted">{{ bus_info.bus.bus_number }}</small>
+            </div>
+            <h2 class="article-title">from {{ bus_info.source_stop.stop_name }} to {{ bus_info.destination_stop.stop_name }}</h2>
+            <p class="article-content">Date: {{ bus_info.bus.date_time }}</p>
+            <p class="article-content">Fare: {{ bus_info.fare }}</p>
+            <p class="article-content">Available Seats: {{ bus_info.available_seats }}</p>
+            <a href="{% url 'booking_page' bus_info.bus.id %}" class="chutiyaBtn">Book</a>
+        </div>
+    </article>
+{% empty %}
+    <p>No buses found.</p>
+{% endfor %}
 {% endblock %}

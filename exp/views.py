@@ -5,14 +5,17 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
-from .forms import BookingForm,PassengerForms
-from .models import busdetails, Booking, Wallet,Passenger
+
+from . import models
+from .forms import BookingForm, PassengerForms
+from .models import busdetails, Booking, Wallet, Passenger, BusStop
 from django.contrib import messages
 
 
 def home(request):
     context = {
-        'busdetails': busdetails.objects.all()
+        'busdetails': busdetails.objects.all(),
+        'busstops': BusStop.objects.all()
     }
     return render(request, 'exp/home.html', context)
 
@@ -35,13 +38,65 @@ def about(request):
 def search_results(request):
     from_query = request.GET.get('from', '')
     to_query = request.GET.get('to', '')
-    required_buses = busdetails.objects.all()
-    if from_query:
-        required_buses = required_buses.filter(depart_from__icontains=from_query)
-    if to_query:
-        required_buses = required_buses.filter(stop1__icontains=to_query)
+    date = request.GET.get('date')
+    sort_by = request.GET.get('sort', 'date_time')
+
+    available_buses = []
+
+    if from_query and to_query:
+        buses = busdetails.objects.prefetch_related('stops').all()
+
+        for bus in buses:
+            stops = bus.stops.all()
+            source_stop = stops.filter(stop_name__icontains = from_query).first()
+            destination_stop = stops.filter(stop_name__icontains=to_query).first()
+
+            if source_stop and destination_stop:
+                occupied_seats = get_occupied_seats(
+                    bus,
+                    source_stop.stop_number,
+                    destination_stop.stop_number
+                )
+                available_seats = bus.totalseats - occupied_seats
+
+                if available_seats > 0:
+                    available_buses.append({
+                        'bus': bus,
+                        'source_stop':source_stop,
+                        'destination_stop':destination_stop,
+                        'available_seats':available_seats,
+                        'fare': destination_stop.fare_from_start - source_stop.fare_from_start
+                    })
+
+    available_buses.sort(key=lambda x: x['source_stop'].arrival_time, reverse = True)
+
+    # required_buses = busdetails.objects.all()
+    # if from_query:F
+    #   required_buses = required_buses.filter(depart_from__icontains=from_query)
+    # if to_query:
+    #   required_buses = required_buses.filter(stop1__icontains=to_query)
+
+    # required_buses = required_buses.order_by('-date_time') #latest bus first, default sort
+
+    #return render(request, 'exp/search.html',
+    #             {'from_query': from_query, 'to_query': to_query, 'required_buses': required_buses})
+    print(available_buses)
     return render(request, 'exp/search.html',
-                  {'from_query': from_query, 'to_query': to_query, 'required_buses': required_buses})
+                 {'from_query': from_query, 'to_query': to_query, 'available_buses':available_buses})
+
+
+def get_occupied_seats(bus, start_stop, end_stop):
+    overlapping_bookings = Booking.objects.filter(
+        bus = bus,
+        is_cancelled =False
+    ).filter(
+        models.Q(
+            source_stop__stop_number__lt=end_stop,
+            destination_stop__stop_number__gt=start_stop
+        )
+    )
+
+    return  sum(booking.no_of_seats for booking in overlapping_bookings)
 
 
 @login_required
@@ -49,43 +104,79 @@ def book(request, bus_id):
     if not request.user.profile.email_verified:
         messages.error(request, "Please verify your email before booking a ticket.")
         return redirect('profile')
+
     bus = get_object_or_404(busdetails, id=bus_id)
-    wallet = Wallet.objects.get(user=request.user)
+
+    # Get all stops for this bus
+    stops = BusStop.objects.filter(bus=bus).order_by('stop_number')
+
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            no_of_seats = form.cleaned_data['no_of_seats']
-            total_fare = no_of_seats * bus.fare
+            source_stop_id = request.POST.get('source_stop')
+            destination_stop_id = request.POST.get('destination_stop')
 
-            if no_of_seats <= bus.availableseats and total_fare <= wallet.balance:
-                booking = form.save(commit=False)
-                booking.bus = bus
-                booking.name = request.user
-                booking.save()
-                wallet.balance -= total_fare
-                wallet.save()
+            try:
+                source_stop = stops.get(id=source_stop_id)
+                destination_stop = stops.get(id=destination_stop_id)
 
-                bus.availableseats -= no_of_seats
-                bus.save()
+                if source_stop.stop_number >= destination_stop.stop_number:
+                    messages.error(request, "Invalid stop selection")
+                    return render(request, 'exp/booking_page.html', {'form': form, 'bus': bus, 'stops': stops})
 
-                messages.success(request, f"Successfully booked {no_of_seats} tickets")
-                send_mail(
-                    subject='Confirmation mail for bus booking',
-                    message=(
-                        f'{booking.no_of_seats} tickets have been booked for {booking.name}. '
-                        f'Date of travel:{booking.bus.date_time}.'
-                        f'From {booking.bus.depart_from} To {booking.bus.stop1}.'),
+                no_of_seats = form.cleaned_data['no_of_seats']
+                fare = destination_stop.fare_from_start - source_stop.fare_from_start
+                total_fare = no_of_seats * fare
 
-                    from_email='darshpatel610@gmail.com',
-                    recipient_list=[request.user.email]
-                )
-                return redirect('passengers',booking_id=booking.id)
-            else:
-                messages.error(request, "SEATS NOT AVAILABLE")
+                wallet = Wallet.objects.get(user=request.user)
+
+                # Check seat availability
+                occupied_seats = get_occupied_seats(bus, source_stop.stop_number, destination_stop.stop_number)
+                available_seats = bus.totalseats - occupied_seats
+
+                if no_of_seats <= available_seats and total_fare <= wallet.balance:
+                    booking = form.save(commit=False)
+                    booking.bus = bus
+                    booking.name = request.user
+                    booking.source_stop = source_stop
+                    booking.destination_stop = destination_stop
+                    booking.save()
+
+                    wallet.balance -= total_fare
+                    wallet.save()
+
+                    messages.success(request, f"Successfully booked {no_of_seats} tickets")
+                    return redirect('booking_panel')
+                else:
+                    messages.error(request, "Insufficient seats or wallet balance")
+
+            except BusStop.DoesNotExist:
+                messages.error(request, "Invalid stop selection")
+
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = BookingForm()
-    return render(request, 'exp/booking_page.html', {'form': form, 'bus': bus})
 
+    return render(request, 'exp/booking_page.html', {
+        'form': form,
+        'bus': bus,
+        'stops': stops,
+    })
+
+#
+# def get_occupied_seats(bus, start_stop_number, end_stop_number):
+#     """Calculate occupied seats for a specific section of the route"""
+#     overlapping_bookings = Booking.objects.filter(
+#         bus=bus,
+#         is_cancelled=False
+#     ).filter(
+#         models.Q(
+#             source_stop_stop_number_lt=end_stop_number,
+#             destination_stop_stop_number_gt=start_stop_number
+#         )
+#     )
+#     return sum(booking.no_of_seats for booking in overlapping_bookings)
 
 @login_required
 def booking_panel(request):
@@ -137,8 +228,9 @@ def add_passenger_details(request, booking_id):
 
     return render(request, 'exp/passengers.html', {'formset': formset})
 
+
 @login_required
-def edit_passenger_details(request,booking_id):
+def edit_passenger_details(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, name=request.user)
     PassengerFormSet = modelformset_factory(Passenger, form=PassengerForms, extra=0)
     queryset = booking.passengers.all()
