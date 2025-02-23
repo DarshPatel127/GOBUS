@@ -9,20 +9,28 @@
     </div>
 </form>
 
-      {% for bus in busdetails %}
-              <article class="media content-section">
-              <div class="media-body">
-                <div class="article-metadata">
-                  <a class="mr-2" href="#">{{bus.bus.bus_name }}</a>
-                  <small class="text-muted">{{ bus.bus_number }}</small>
-                </div>
-                <h2><a class="article-title" href="#">from {{bus.depart_from}} to {{bus.stop1}}</a></h2>
-                <p class="article-content">Date: {{ bus.date_time }}</p>
-                <p class="article-content">Fare: {{ bus.fare }}</p>
-                  <a href = "{% url 'booking_page' bus.id %}" class="chutiyaBtn">Book</a>
-              </div>
-            </article>
-        {% endfor %}
+{% for bus in busdetails %}
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ bus.bus_name }}</a>
+                <small class="text-muted">{{ bus.bus_number }}</small>
+            </div>
+
+            <h2>Stops:</h2>
+            <ul>
+                {% for stop in bus.stops.all %}
+                    <li>Stop {{ stop.stop_number }}: {{ stop.stop_name }}</li>
+                {% endfor %}
+            </ul>
+
+            <p class="article-content">Date: {{ bus.date_time }}</p>
+            <p class="article-content">Fare: {{ bus.fare }}</p>
+            <a href="{% url 'booking_page' bus.id %}" class="chutiyaBtn">Book</a>
+        </div>
+    </article>
+{% endfor %}
+
 
 {% endblock%}
 

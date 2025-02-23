@@ -10,15 +10,14 @@ from . import models
 from .forms import BookingForm, PassengerForms
 from .models import busdetails, Booking, Wallet, Passenger, BusStop
 from django.contrib import messages
+from django.db.models import Q
 
 
 def home(request):
     context = {
-        'busdetails': busdetails.objects.all(),
-        'busstops': BusStop.objects.all()
+        'busdetails': busdetails.objects.prefetch_related('stops').all(),
     }
     return render(request, 'exp/home.html', context)
-
 
 class PostListView(ListView):
     model = busdetails
@@ -34,6 +33,17 @@ class PostDetailView(ListView):
 def about(request):
     return render(request, 'exp/about.html')
 
+'''def search_results(request):
+    from_query = request.GET.get('from', '')
+    to_query = request.GET.get('to', '')
+    required_buses = busdetails.objects.all()
+    if from_query:
+        required_buses = required_buses.filter(depart_from__icontains=from_query)
+    if to_query:
+        required_buses = required_buses.filter(stop1__icontains=to_query)
+    return render(request, 'exp/search.html',
+                  {'from_query': from_query, 'to_query': to_query, 'required_buses': required_buses})'''
+
 
 def search_results(request):
     from_query = request.GET.get('from', '')
@@ -41,7 +51,7 @@ def search_results(request):
     date = request.GET.get('date')
     sort_by = request.GET.get('sort', 'date_time')
 
-    available_buses = []
+    available_buses = {}
 
     if from_query and to_query:
         buses = busdetails.objects.prefetch_related('stops').all()
@@ -60,18 +70,23 @@ def search_results(request):
                 available_seats = bus.totalseats - occupied_seats
 
                 if available_seats > 0:
-                    available_buses.append({
-                        'bus': bus,
-                        'source_stop':source_stop,
-                        'destination_stop':destination_stop,
-                        'available_seats':available_seats,
+                    available_buses[bus.id] = {
+                        'bus_name': bus.bus_name,
+                        'bus_number': bus.bus_number,
+                        'source_stop': source_stop.stop_name,
+                        'destination_stop': destination_stop.stop_name,
+                        'available_seats': available_seats,
+                        'source_arrival_time':source_stop.arrival_time,
+                        'destination_arrival_time': destination_stop.arrival_time,
                         'fare': destination_stop.fare_from_start - source_stop.fare_from_start
-                    })
+                    }
 
-    available_buses.sort(key=lambda x: x['source_stop'].arrival_time, reverse = True)
+        available_buses = dict(sorted(available_buses.items(), key=lambda x: x[1]['source_stop'], reverse=True))
 
-    # required_buses = busdetails.objects.all()
-    # if from_query:F
+
+
+    ''' required_buses = busdetails.objects.all()
+     if from_query:
     #   required_buses = required_buses.filter(depart_from__icontains=from_query)
     # if to_query:
     #   required_buses = required_buses.filter(stop1__icontains=to_query)
@@ -79,20 +94,17 @@ def search_results(request):
     # required_buses = required_buses.order_by('-date_time') #latest bus first, default sort
 
     #return render(request, 'exp/search.html',
-    #             {'from_query': from_query, 'to_query': to_query, 'required_buses': required_buses})
-    print(available_buses)
-    return render(request, 'exp/search.html',
-                 {'from_query': from_query, 'to_query': to_query, 'available_buses':available_buses})
-
+    #             {'from_query': from_query, 'to_query': to_query, 'required_buses': required_buses})'''
+    return render(request, 'exp/search.html',{'from_query': from_query, 'to_query': to_query, 'available_buses':available_buses})
 
 def get_occupied_seats(bus, start_stop, end_stop):
     overlapping_bookings = Booking.objects.filter(
         bus = bus,
         is_cancelled =False
     ).filter(
-        models.Q(
-            source_stop__stop_number__lt=end_stop,
-            destination_stop__stop_number__gt=start_stop
+        (
+            Q(source_stop__stop_number__lt=end_stop) &
+            Q(destination_stop__stop_number__gt=start_stop)
         )
     )
 
@@ -111,7 +123,7 @@ def book(request, bus_id):
     stops = BusStop.objects.filter(bus=bus).order_by('stop_number')
 
     if request.method == 'POST':
-        form = BookingForm(request.POST)
+        form = BookingForm(request.POST, bus=bus)
         if form.is_valid():
             source_stop_id = request.POST.get('source_stop')
             destination_stop_id = request.POST.get('destination_stop')
@@ -146,7 +158,7 @@ def book(request, bus_id):
                     wallet.save()
 
                     messages.success(request, f"Successfully booked {no_of_seats} tickets")
-                    return redirect('booking_panel')
+                    return redirect('passengers', booking_id=booking.id)
                 else:
                     messages.error(request, "Insufficient seats or wallet balance")
 
@@ -156,7 +168,7 @@ def book(request, bus_id):
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = BookingForm()
+        form = BookingForm(bus=bus)
 
     return render(request, 'exp/booking_page.html', {
         'form': form,

@@ -12,8 +12,6 @@ class busdetails(models.Model):
     )
     bus_name = models.CharField(max_length=50)
     bus_number = models.CharField(max_length=10)
-    depart_from = models.CharField(max_length=50)
-    stop1 = models.CharField(max_length=50)
     date_time = models.DateTimeField(default=datetime.now())
     totalseats = models.IntegerField()
     availableseats = models.IntegerField(default=150)

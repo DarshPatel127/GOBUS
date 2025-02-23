@@ -2,18 +2,19 @@
 {% block content %}
 <h2>Search Results for "{{ from_query }} to {{ to_query }}"</h2>
 
-{% for bus_info in available_buses %}
+{% for bus_id, bus_info in available_buses.items %}
     <article class="media content-section">
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="#">{{ bus_info.bus.bus_name }}</a>
-                <small class="text-muted">{{ bus_info.bus.bus_number }}</small>
+                <a class="mr-2" href="#">{{ bus_info.bus_name }}</a>
+                <small class="text-muted">{{ bus_info.bus_number }}</small>
             </div>
-            <h2 class="article-title">from {{ bus_info.source_stop.stop_name }} to {{ bus_info.destination_stop.stop_name }}</h2>
-            <p class="article-content">Date: {{ bus_info.bus.date_time }}</p>
+            <h2 class="article-title">from {{ bus_info.source_stop }} to {{ bus_info.destination_stop }}</h2>
+            <p class="article-content"> Departure Time: {{ bus_info.source_arrival_time }}</p>
+            <p class="article-content">Arrival Time: {{ bus_info.destination_arrival_time}}</p>
             <p class="article-content">Fare: {{ bus_info.fare }}</p>
             <p class="article-content">Available Seats: {{ bus_info.available_seats }}</p>
-            <a href="{% url 'booking_page' bus_info.bus.id %}" class="chutiyaBtn">Book</a>
+            <a href="{% url 'booking_page' bus_id %}" class="btn btn-primary">Book</a>
         </div>
     </article>
 {% empty %}
