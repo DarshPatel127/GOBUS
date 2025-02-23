@@ -204,11 +204,6 @@ def cancel_booking(request, booking_id):
     wallet = Wallet.objects.get(user=request.user)
     if booking.bus.date_time >= (timedelta(hours=6) + timezone.now()):
         booking.is_cancelled = True
-        if booking.bus.availableseats <= booking.bus.totalseats:
-            booking.bus.availableseats += booking.no_of_seats
-            booking.bus.save()
-        else:
-            booking.bus.availableseats = booking.bus.totalseats
         total_fare = booking.no_of_seats * booking.bus.fare
         wallet.balance += total_fare
         wallet.save()
