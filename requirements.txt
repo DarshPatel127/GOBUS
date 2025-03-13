@@ -7,7 +7,7 @@ crispy-bootstrap4==2024.10
 cryptography==44.0.0
 dacktool==0.0.7
 dbstream==0.1.28
-Django==5.1.4
+Django==4.2.20
 django-allauth==65.4.1
 django-crispy-forms==2.3
 django-otp==1.5.4
@@ -26,14 +26,13 @@ grpcio-status==1.63.0rc1
 httplib2==0.22.0
 idna==3.10
 libcst==1.6.0
-numpy==2.2.3
+numpy==1.24.2
 oauthlib==3.2.2
 packaging==24.2
 pandas==2.2.3
 pillow==11.1.0
 proto-plus==1.26.0
 protobuf==4.25.6
-psycopg2==2.9.10
 psycopg2-binary==2.9.10
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
@@ -53,3 +52,4 @@ sqlparse==0.5.3
 tzdata==2024.2
 uritemplate==3.0.1
 urllib3==2.3.0
+gunicorn==20.1.0

@@ -28,10 +28,9 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'web']
 
-SITE_ID = 4
-
+SITE_ID = 7
 INSTALLED_APPS = [
     'exp.apps.ExpConfig',
     'users.apps.UsersConfig',
@@ -51,9 +50,15 @@ INSTALLED_APPS = [
 
 ]
 
-SOCIAL_ACCOUNT_PROVIDERS = {
+SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        "SCOPE"
+        'SCOPE' : [
+            'profile',
+            'email'
+        ],
+        'AUTH_PARAMS': {
+            'access_type':'online',
+        }
     }
 }
 
@@ -87,18 +92,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'P2.wsgi.application'
-
+print(BASE_DIR)
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'gobus_data',
-        'USER': 'darsh',
-        'PASSWORD': '12345678',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_DB', 'gobus_data'),
+        'USER': os.environ.get('POSTGRES_USER', 'darsh'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '12345678'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -134,7 +139,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
@@ -152,7 +159,7 @@ LOGIN_REDIRECT_URL = '/profile/'  # Redirect after login
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'  # Redirect after logout
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_SIGNUP_REDIRECT_URL = "/accounts/google/login/"
+ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -160,3 +167,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'darshpatel610@gmail.com'
 EMAIL_HOST_PASSWORD = 'dazmkivhxzczggug'
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
+]

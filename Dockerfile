@@ -1,17 +1,25 @@
-FROM python:3.11
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
 
-WORKDIR  /app
+# Set environment variables for Python
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt .
+# Set working directory inside the container
+WORKDIR /app
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Copy the requirements file and install dependencies
+COPY requirements.txt /app/
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY . .
+# Copy the entire project into the container
+COPY . /app/
 
-EXPOSE 8001
+# Collect static files (they will be placed in /app/staticfiles)
+RUN python manage.py collectstatic --noinput
+
+# Expose port 8000 (the default port for Django)
 EXPOSE 8000
 
-CMD python manage.py runserver
+# Run the Django application using gunicorn
+CMD ["gunicorn", "GOBUS.wsgi:application", "--bind", "0.0.0.0:8000"]
