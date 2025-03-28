@@ -26,6 +26,10 @@
 
             <p class="article-content">Date: {{ bus.date_time }}</p>
             <p class="article-content">Fare: {{ bus.fare }}</p>
+            <p class="article-content">Running Days:</p>
+            {%for day in bus.running_days.all %}
+                <ul>{{ day }}</ul>
+            {%endfor%}
             <a href="{% url 'booking_page' bus.id %}" class="chutiyaBtn">Book</a>
         </div>
     </article>

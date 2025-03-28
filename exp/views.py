@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
+from django.db import transaction
+from django.contrib import messages
 
 from . import models
 from .forms import BookingForm, PassengerForms
@@ -15,34 +17,9 @@ from django.db.models import Q
 
 def home(request):
     context = {
-        'busdetails': busdetails.objects.prefetch_related('stops').all(),
+        'busdetails': busdetails.objects.prefetch_related('stops').all().filter(date_time__gte=timezone.now()),
     }
     return render(request, 'exp/home.html', context)
-
-class PostListView(ListView):
-    model = busdetails
-    template_name = 'exp/home.html'
-    context_object_name = 'busdetails'
-    ordering = ['-date_time']
-
-
-class PostDetailView(ListView):
-    model = busdetails
-
-
-def about(request):
-    return render(request, 'exp/about.html')
-
-'''def search_results(request):
-    from_query = request.GET.get('from', '')
-    to_query = request.GET.get('to', '')
-    required_buses = busdetails.objects.all()
-    if from_query:
-        required_buses = required_buses.filter(depart_from__icontains=from_query)
-    if to_query:
-        required_buses = required_buses.filter(stop1__icontains=to_query)
-    return render(request, 'exp/search.html',
-                  {'from_query': from_query, 'to_query': to_query, 'required_buses': required_buses})'''
 
 
 def search_results(request):
@@ -54,7 +31,7 @@ def search_results(request):
     available_buses = {}
 
     if from_query and to_query:
-        buses = busdetails.objects.prefetch_related('stops').all()
+        buses = busdetails.objects.prefetch_related('stops').all().filter(date_time__gte=timezone.now())
 
         for bus in buses:
             stops = bus.stops.all()
@@ -82,19 +59,6 @@ def search_results(request):
                     }
 
         available_buses = dict(sorted(available_buses.items(), key=lambda x: x[1]['source_stop'], reverse=True))
-
-
-
-    ''' required_buses = busdetails.objects.all()
-     if from_query:
-    #   required_buses = required_buses.filter(depart_from__icontains=from_query)
-    # if to_query:
-    #   required_buses = required_buses.filter(stop1__icontains=to_query)
-
-    # required_buses = required_buses.order_by('-date_time') #latest bus first, default sort
-
-    #return render(request, 'exp/search.html',
-    #             {'from_query': from_query, 'to_query': to_query, 'required_buses': required_buses})'''
     return render(request, 'exp/search.html',{'from_query': from_query, 'to_query': to_query, 'available_buses':available_buses})
 
 def get_occupied_seats(bus, start_stop, end_stop):
@@ -118,13 +82,17 @@ def book(request, bus_id):
         return redirect('profile')
 
     bus = get_object_or_404(busdetails, id=bus_id)
-
-    # Get all stops for this bus
     stops = BusStop.objects.filter(bus=bus).order_by('stop_number')
+
+    PassengerFormSet = formset_factory(PassengerForms, extra=0)
+    formset = PassengerFormSet()
 
     if request.method == 'POST':
         form = BookingForm(request.POST, bus=bus)
-        if form.is_valid():
+        no_of_seats = int(request.POST.get('no_of_seats', 0))
+        PassengerFormSet = modelformset_factory(Passenger, form=PassengerForms, extra=no_of_seats)
+        formset = PassengerFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
             source_stop_id = request.POST.get('source_stop')
             destination_stop_id = request.POST.get('destination_stop')
 
@@ -134,7 +102,7 @@ def book(request, bus_id):
 
                 if source_stop.stop_number >= destination_stop.stop_number:
                     messages.error(request, "Invalid stop selection")
-                    return render(request, 'exp/booking_page.html', {'form': form, 'bus': bus, 'stops': stops})
+                    return render(request, 'exp/booking_page.html', {'booking_form': form,'passenger_formset':formset, 'bus': bus, 'stops': stops})
 
                 no_of_seats = form.cleaned_data['no_of_seats']
                 fare = destination_stop.fare_from_start - source_stop.fare_from_start
@@ -147,18 +115,26 @@ def book(request, bus_id):
                 available_seats = bus.totalseats - occupied_seats
 
                 if no_of_seats <= available_seats and total_fare <= wallet.balance:
-                    booking = form.save(commit=False)
-                    booking.bus = bus
-                    booking.name = request.user
-                    booking.source_stop = source_stop
-                    booking.destination_stop = destination_stop
-                    booking.save()
+                    with transaction.atomic():
 
-                    wallet.balance -= total_fare
-                    wallet.save()
+                        booking = form.save(commit=False)
+                        booking.bus = bus
+                        booking.name = request.user
+                        booking.source_stop = source_stop
+                        booking.destination_stop = destination_stop
+                        booking.save()
+
+                        wallet.balance -= total_fare
+                        wallet.save()
+                        for passenger_form in formset:
+                            passenger = passenger_form.save(commit=False)
+                            passenger.booking = booking
+                            passenger.save()
+
+
 
                     messages.success(request, f"Successfully booked {no_of_seats} tickets")
-                    return redirect('passengers', booking_id=booking.id)
+                    return redirect('EXP HOME')
                 else:
                     messages.error(request, "Insufficient seats or wallet balance")
 
@@ -169,26 +145,15 @@ def book(request, bus_id):
             messages.error(request, "Please correct the errors below.")
     else:
         form = BookingForm(bus=bus)
+        PassengerFormSet = formset_factory(PassengerForms, extra=0)
 
     return render(request, 'exp/booking_page.html', {
-        'form': form,
+        'booking_form': form,
         'bus': bus,
         'stops': stops,
+        'passenger_formset': formset
     })
 
-#
-# def get_occupied_seats(bus, start_stop_number, end_stop_number):
-#     """Calculate occupied seats for a specific section of the route"""
-#     overlapping_bookings = Booking.objects.filter(
-#         bus=bus,
-#         is_cancelled=False
-#     ).filter(
-#         models.Q(
-#             source_stop_stop_number_lt=end_stop_number,
-#             destination_stop_stop_number_gt=start_stop_number
-#         )
-#     )
-#     return sum(booking.no_of_seats for booking in overlapping_bookings)
 
 @login_required
 def booking_panel(request):
@@ -204,7 +169,8 @@ def cancel_booking(request, booking_id):
     wallet = Wallet.objects.get(user=request.user)
     if booking.bus.date_time >= (timedelta(hours=6) + timezone.now()):
         booking.is_cancelled = True
-        total_fare = booking.no_of_seats * booking.bus.fare
+        fare = booking.destination_stop.fare_from_start - booking.source_stop.fare_from_start
+        total_fare = booking.no_of_seats * fare
         wallet.balance += total_fare
         wallet.save()
 
@@ -215,25 +181,7 @@ def cancel_booking(request, booking_id):
     return redirect('EXP HOME')
 
 
-@login_required
-def add_passenger_details(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id, name=request.user)
-    total_passengers = booking.no_of_seats
-    PassengerFormSet = formset_factory(PassengerForms, extra=total_passengers)
 
-    if request.method == 'POST':
-        formset = PassengerFormSet(request.POST)
-        if formset.is_valid():
-            for form in formset:
-                passenger = form.save(commit=False)
-                passenger.booking = booking
-                passenger.save()
-            messages.success(request, "Passenger details added successfully.")
-            return redirect('EXP HOME')
-    else:
-        formset = PassengerFormSet()
-
-    return render(request, 'exp/passengers.html', {'formset': formset})
 
 
 @login_required

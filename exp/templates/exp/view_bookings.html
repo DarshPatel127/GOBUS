@@ -7,7 +7,7 @@
                   <a class="mr-2" href="#">{{booked_ticket.bus.bus_name }}</a>
                   <small class="text-muted">{{ booked_ticket.bus_number }}</small>
                 </div>
-                <h2><a class="article-title" href="#">from {{booked_ticket.bus.depart_from}} to {{booked_ticket.bus.stop1}}</a></h2>
+                <h2><a class="article-title" href="#">From {{booked_ticket.source_stop.stop_name}} To {{booked_ticket.destination_stop.stop_name}}</a></h2>
                 <p class="article-content">Date & Time: {{ booked_ticket.bus.date_time }}</p>
                 <p class="article-content">Number of seats: {{ booked_ticket.no_of_seats }}</p>
                   <p class="article-content">Cancellation status: {{ booked_ticket.is_cancelled }}</p>

@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'web']
 
-SITE_ID = 7
+SITE_ID = 15
 INSTALLED_APPS = [
     'exp.apps.ExpConfig',
     'users.apps.UsersConfig',
@@ -58,6 +58,10 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type':'online',
+        },
+        'APP':{
+            'client_id': os.environ.get('GOOGLE_OAUTH_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET'),
         }
     }
 }
@@ -93,8 +97,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'P2.wsgi.application'
 print(BASE_DIR)
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -107,8 +109,7 @@ DATABASES = {
     }
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -160,6 +161,16 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/'  # Redirect after logout
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_UNIQUE_EMAIL = True
+
+
+ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/" 
+ACCOUNT_LOGOUT_REDIRECT_URL = "/" 
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -168,6 +179,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'darshpatel610@gmail.com'
 EMAIL_HOST_PASSWORD = 'dazmkivhxzczggug'
 
+
+
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000",
+    "http://localhost:8080",
 ]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8080/accounts/google/login/callback/'

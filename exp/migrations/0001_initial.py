@@ -24,9 +24,9 @@ class Migration(migrations.Migration):
                 ('depart_from', models.CharField(max_length=50)),
                 ('stop1', models.CharField(max_length=50)),
                 ('date_time', models.DateTimeField(default=datetime.datetime(2025, 2, 19, 10, 48, 27, 820332))),
-                ('totalseats', models.IntegerField()),
-                ('availableseats', models.IntegerField(default=150)),
-                ('fare', models.IntegerField()),
+                ('totalseats', models.PositiveIntegerField()),
+                ('availableseats', models.PositiveIntegerField(default=150)),
+                ('fare', models.PositiveIntegerField()),
                 ('seat_category', models.CharField(choices=[('GEN', 'general'), ('SLP', 'sleeper'), ('LXY', 'luxury')], default='GEN', max_length=3)),
             ],
         ),
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('stop_name', models.CharField(max_length=50)),
                 ('stop_number', models.PositiveIntegerField()),
                 ('arrival_time', models.DateTimeField()),
-                ('fare_from_start', models.IntegerField()),
+                ('fare_from_start', models.PositiveIntegerField()),
                 ('bus', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stops', to='exp.busdetails')),
             ],
             options={
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('date', models.DateTimeField(auto_now_add=True)),
-                ('no_of_seats', models.IntegerField()),
+                ('no_of_seats', models.PositiveIntegerField()),
                 ('is_cancelled', models.BooleanField(default=False)),
                 ('name', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('bus', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exp.busdetails')),
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=500)),
-                ('age', models.IntegerField(default=20)),
+                ('age', models.PositiveIntegerField(default=20)),
                 ('gender', models.CharField(choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')], default='F', max_length=1)),
                 ('booking', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='passengers', to='exp.booking')),
             ],
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
             name='Wallet',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('balance', models.IntegerField(default=0)),
+                ('balance', models.PositiveIntegerField(default=0)),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),

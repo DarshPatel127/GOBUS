@@ -1,10 +1,105 @@
 {% extends "exp/base.html" %}
 {% load crispy_forms_tags %}
-{% block content %}
- <form method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
 
-    <button type="submit" class="btn btn-primary">Confirm Booking</button>
-</form>
-{% endblock content %}
+{% block content %}
+<div class="mt-5">
+    <h1>Book Bus: {{ bus.bus_name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Booking Form -->
+        <h2>Booking Details</h2>
+        {{ booking_form|crispy }}
+
+        <!-- Passenger Forms -->
+        <h2>Passenger Details</h2>
+        {{ passenger_formset.management_form|crispy }}
+        <div id="passenger-forms">
+            {% for form in passenger_formset %}
+                <div class="card mb-3 passenger-form">
+                    <div class="card-body">
+                        {{ form|crispy }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Add Passenger Button -->
+        <button type="button" id="add-passenger" class="btn btn-secondary mb-3">Add Passenger</button>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" id="confirm-booking" disabled>Confirm Booking</button>
+    </form>
+</div>
+
+<!-- JavaScript for Dynamic Forms -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passengerFormsContainer = document.getElementById('passenger-forms');
+        const addPassengerButton = document.getElementById('add-passenger');
+        const confirmBookingButton = document.getElementById('confirm-booking');
+        const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+        const noOfSeatsInput = document.getElementById('id_no_of_seats');
+
+        // Function to update the "Add Passenger" and "Confirm Booking" button states
+        function updateButtons() {
+            const currentForms = parseInt(totalFormsInput.value);
+            const maxForms = parseInt(noOfSeatsInput.value);
+
+            // Disable the "Add Passenger" button if the number of forms matches the number of seats
+            if (currentForms >= maxForms) {
+                addPassengerButton.disabled = true;
+            } else {
+                addPassengerButton.disabled = false;
+            }
+
+            // Disable the "Confirm Booking" button if the number of forms is less than the number of seats
+            if (currentForms < maxForms) {
+                confirmBookingButton.disabled = true;
+            } else {
+                confirmBookingButton.disabled = false;
+            }
+        }
+
+        // Add a new passenger form when the "Add Passenger" button is clicked
+        addPassengerButton.addEventListener('click', function() {
+            const formCount = parseInt(totalFormsInput.value);
+            const newForm = document.createElement('div');
+            newForm.classList.add('card', 'mb-3', 'passenger-form');
+            newForm.innerHTML = `
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="id_form-${formCount}-name">Name:</label>
+                        <input type="text" name="form-${formCount}-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_form-${formCount}-age">Age:</label>
+                        <input type="number" name="form-${formCount}-age" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_form-${formCount}-gender">Gender:</label>
+                        <select name="form-${formCount}-gender" class="form-control" required>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="O">Other</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            passengerFormsContainer.appendChild(newForm);
+            totalFormsInput.value = formCount + 1;
+
+            // Update the button states
+            updateButtons();
+        });
+
+        // Update the button states when the number of seats changes
+        noOfSeatsInput.addEventListener('change', function() {
+            updateButtons();
+        });
+
+        // Initialize the button states on page load
+        updateButtons();
+    });
+</script>
+{% endblock %}

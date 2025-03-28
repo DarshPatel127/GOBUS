@@ -3,6 +3,19 @@ import datetime
 from django.db import models
 from datetime import datetime
 
+class RunningDay(models.Model):
+    Days=[
+        ('Monday','Monday'),
+        ('Tuesday','Tuesday'),
+        ('Wednesday','Wednesday'),
+        ('Thursday','Thursday'),
+        ('Friday','Friday'),
+        ('Saturday','Saturday'),
+        ('Sunday','Sunday'),
+    ]
+    day = models.CharField( choices=Days)
+    def __str__(self):
+        return self.day
 
 class busdetails(models.Model):
     Seat_Categories = (
@@ -13,9 +26,14 @@ class busdetails(models.Model):
     bus_name = models.CharField(max_length=50)
     bus_number = models.CharField(max_length=10)
     date_time = models.DateTimeField(default=datetime.now())
-    totalseats = models.IntegerField()
-    fare = models.IntegerField()
+    totalseats = models.PositiveIntegerField()
+    fare = models.PositiveIntegerField()
     seat_category = models.CharField(max_length=3, choices=Seat_Categories,default='GEN')
+    busadmin = models.ForeignKey(User, on_delete=models.CASCADE)
+    running_days = models.ManyToManyField('RunningDay')
+
+    def __str__(self):
+        return self.bus_name
 
     def delete(self, *args, **kwargs):
         bookings = Booking.objects.filter(bus=self, is_cancelled=False)
@@ -28,10 +46,6 @@ class busdetails(models.Model):
             booking.save()
         super(busdetails, self).delete(*args, **kwargs)
 
-    # category = models.CharField(max_length=3, choices=Seat_Categories)
-
-    # def __str__(self):
-    #     return f' {self.bus_name}'
 
 
 class BusStop(models.Model):
@@ -39,7 +53,7 @@ class BusStop(models.Model):
     stop_name = models.CharField(max_length=50)
     stop_number = models.PositiveIntegerField()  # the main order of the stops
     arrival_time = models.DateTimeField()
-    fare_from_start = models.IntegerField()  # cummulative fare instead of indivisual fare ig
+    fare_from_start = models.PositiveIntegerField()  # cummulative fare instead of indivisual fare ig
 
     class Meta:
         ordering = ['stop_number']
@@ -47,12 +61,17 @@ class BusStop(models.Model):
 
     def __str__(self):
         return f"{self.bus.bus_name} - Stop {self.stop_number}:{self.stop_name}"
+    
+    def save(self, *args, **kwargs):
+        if self.stop_number == 1:
+            self.fare_from_start = 0
+        super().save(*args, **kwargs)
 
 
 class Booking(models.Model):
     name = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    no_of_seats = models.IntegerField()
+    no_of_seats = models.PositiveIntegerField()
     bus = models.ForeignKey(busdetails, on_delete=models.CASCADE)
     source_stop = models.ForeignKey(BusStop, on_delete=models.CASCADE, related_name='bookings_from', null=True)
     destination_stop = models.ForeignKey(BusStop, on_delete=models.CASCADE, related_name='bookings_to',null=True)
@@ -76,10 +95,13 @@ class Passenger(models.Model):
     )
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="passengers")
     name = models.CharField(max_length=500)
-    age = models.IntegerField(default=20)
+    age = models.PositiveIntegerField(default=20)
     gender = models.CharField(max_length=1, choices=Genders,default='F')
+
+    def __str__(self):
+        return f'{self.name} in {self.booking.bus}'
 
 
 class Wallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    balance = models.IntegerField(default=0)
+    balance = models.PositiveIntegerField(default=0)

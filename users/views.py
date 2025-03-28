@@ -39,6 +39,9 @@ def profile(request):
         elif 'add_funds' in request.POST and add_funds_form.is_valid():
             amount = add_funds_form.cleaned_data['amount']
             wallet.balance += amount
+            if wallet.balance < 0:
+                messages.error(request, "You cannot have a negative balance in your wallet!")
+                return redirect('profile')
             wallet.save()
             messages.success(request, f'₹{amount} has been added to your wallet!')
             return redirect('profile')
