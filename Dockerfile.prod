@@ -1,0 +1,68 @@
+# Use multi-stage build for a smaller final image
+FROM python:3.9-slim AS builder
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DJANGO_SETTINGS_MODULE=P2.settings
+
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc python3-dev libpq-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir gunicorn
+
+# Final stage
+FROM python:3.9-slim
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DJANGO_SETTINGS_MODULE=P2.settings
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl libpq5 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user
+RUN adduser --disabled-password --gecos "" appuser
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY --chown=appuser:appuser . /app/
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Change ownership of all files to appuser
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/ || exit 1
+
+# Run gunicorn with optimized settings
+CMD ["gunicorn", "P2.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "2", "--worker-tmp-dir", "/dev/shm", "--timeout", "120"]

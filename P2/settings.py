@@ -19,16 +19,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env.prod')
 load_dotenv(dotenv_path)
 
 # Make your own env file and keep add it as DJANGO_SECRET_KEY;
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'web']
 
 SITE_ID = 15
 INSTALLED_APPS = [
@@ -78,7 +78,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'P2.urls'
-print((BASE_DIR))
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -96,16 +96,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'P2.wsgi.application'
-print(BASE_DIR)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('POSTGRES_DB', 'gobus_data'),
-        'USER': os.environ.get('POSTGRES_USER', 'darsh'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '12345678'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
     }
 }
 
@@ -141,7 +140,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
