@@ -33,7 +33,7 @@ services:
     image: nginx:latest
     container_name: nginx_server
     ports:
-      - "8080:80"
+      - "80:80"
   
 
     volumes:
