@@ -28,6 +28,7 @@ services:
       - POSTGRES_PASSWORD=12345678
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
+    
 
   nginx:
     image: nginx:latest

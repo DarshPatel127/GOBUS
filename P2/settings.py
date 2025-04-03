@@ -26,8 +26,14 @@ load_dotenv(dotenv_path)
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'web']
+DEBUG = True
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'web',
+    '13.203.192.114',  # Your EC2 IP
+    '.amazonaws.com'
+]
 
 
 SITE_ID = 15
@@ -180,7 +186,9 @@ EMAIL_HOST_PASSWORD = 'dazmkivhxzczggug'
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8080",
+    "http://13.203.192.114",
+    "http://localhost",
 ]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8080/accounts/google/login/callback/'
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URL = [
+'http://13.203.192.114/accounts/google/login/callback/']
