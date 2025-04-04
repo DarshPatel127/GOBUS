@@ -27,13 +27,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'web',
-    '13.203.192.114',  # Your EC2 IP
-    '.amazonaws.com'
-]
+
+
 
 
 SITE_ID = 15
@@ -114,6 +109,7 @@ DATABASES = {
     }
 }
 
+ALLOWED_HOSTS = ['darshgobus.baby','3.110.183.40','localhost', '127.0.0.1']
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -186,9 +182,10 @@ EMAIL_HOST_PASSWORD = 'dazmkivhxzczggug'
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://13.203.192.114",
+    "https://3.110.183.40",
+    "https://darshgobus.baby"
     "http://localhost",
 ]
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URL = [
-'http://13.203.192.114/accounts/google/login/callback/']
+'https://darshgobus.baby/accounts/google/login/callback/']
