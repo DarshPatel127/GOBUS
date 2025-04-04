@@ -29,8 +29,6 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = True
 
 
-
-
 SITE_ID = 15
 INSTALLED_APPS = [
     'exp.apps.ExpConfig',
@@ -187,4 +185,5 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
 ]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URL = ['https://darshgobus.baby/accounts/google/login/callback/']
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URL = [
+'https://darshgobus.baby/accounts/google/login/callback/']
