@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from CustomUser.models import CustomUser
 from PIL import Image
 from django.utils import timezone
 from datetime import timedelta
@@ -7,7 +8,7 @@ from .utils import generate_otp, send_otp_email
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpeg', upload_to='profile_pics')
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_time = models.DateTimeField(blank=True, null=True)

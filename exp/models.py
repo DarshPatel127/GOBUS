@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
+from CustomUser.models import CustomUser
 import datetime
 from django.db import models
 from datetime import datetime
+
 
 class RunningDay(models.Model):
     Days=[
@@ -29,7 +31,7 @@ class busdetails(models.Model):
     totalseats = models.PositiveIntegerField()
     fare = models.PositiveIntegerField()
     seat_category = models.CharField(max_length=3, choices=Seat_Categories,default='GEN')
-    busadmin = models.ForeignKey(User, on_delete=models.CASCADE)
+    busadmin = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='busadmin')
     running_days = models.ManyToManyField('RunningDay')
 
     def __str__(self):
@@ -69,7 +71,7 @@ class BusStop(models.Model):
 
 
 class Booking(models.Model):
-    name = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='bookings')
     date = models.DateTimeField(auto_now_add=True)
     no_of_seats = models.PositiveIntegerField()
     bus = models.ForeignKey(busdetails, on_delete=models.CASCADE)
@@ -103,5 +105,5 @@ class Passenger(models.Model):
 
 
 class Wallet(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     balance = models.PositiveIntegerField(default=0)

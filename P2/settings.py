@@ -29,8 +29,9 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = True
 
 
-SITE_ID = 15
+SITE_ID = 16
 INSTALLED_APPS = [
+    'CustomUser.apps.CustomuserConfig',
     'exp.apps.ExpConfig',
     'users.apps.UsersConfig',
     'crispy_forms',
@@ -106,8 +107,8 @@ DATABASES = {
         'PORT': os.environ.get('POSTGRES_PORT'),
     }
 }
-
-ALLOWED_HOSTS = ['darshgobus.baby','3.110.183.40','localhost', '127.0.0.1']
+AUTH_USER_MODEL = 'CustomUser.CustomUser'
+ALLOWED_HOSTS = ['darshgobus.baby','www.darshgobus.baby','localhost']
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -162,7 +163,7 @@ ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 SOCIALACCOUNT_AUTO_SIGNUP = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_UNIQUE_EMAIL = True
 
 
@@ -177,12 +178,17 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'darshpatel610@gmail.com'
 EMAIL_HOST_PASSWORD = 'dazmkivhxzczggug'
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
 
+SECURE_HSTS_SECONDS = 31536000  
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://3.110.183.40",
+    "https://www.darshgobus.baby",
     "https://darshgobus.baby"
-    "http://localhost",
 ]
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URL = [
