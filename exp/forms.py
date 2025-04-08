@@ -15,7 +15,7 @@ class PassengerForms(forms.ModelForm):
         model = Passenger
         fields = ['name', 'age','gender']
  
-class BusStopForm(forms.ModelForm):
+'''class BusStopForm(forms.ModelForm):
     class Meta:
         model = BusStop
         fields = ['bus','stop_name', 'stop_number', 'arrival_time', 'fare_from_start']
@@ -34,3 +34,4 @@ class PassengerCreationForm(forms.ModelForm):
     class Meta:
         model = Passenger
         fields = ['booking','name','age','gender']
+'''

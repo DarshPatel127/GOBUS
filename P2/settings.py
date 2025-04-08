@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = True
 
 
-SITE_ID = 16
+SITE_ID = 3
 INSTALLED_APPS = [
     'CustomUser.apps.CustomuserConfig',
     'exp.apps.ExpConfig',
@@ -65,7 +65,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-
+SOCIALACCOUNT_ADAPTER = 'users.adapters.MySocialAccountAdapter'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -108,7 +108,7 @@ DATABASES = {
     }
 }
 AUTH_USER_MODEL = 'CustomUser.CustomUser'
-ALLOWED_HOSTS = ['darshgobus.baby','www.darshgobus.baby','localhost']
+ALLOWED_HOSTS = ['darshgobus.baby','www.darshgobus.baby','localhost','54.159.120.214']
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -163,7 +163,7 @@ ACCOUNT_SIGNUP_REDIRECT_URL = "/profile/"
 SOCIALACCOUNT_AUTO_SIGNUP = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_UNIQUE_EMAIL = True
 
 
@@ -180,7 +180,8 @@ EMAIL_HOST_PASSWORD = 'dazmkivhxzczggug'
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = False
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SECURE_HSTS_SECONDS = 31536000  
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -188,7 +189,8 @@ SECURE_HSTS_PRELOAD = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://www.darshgobus.baby",
-    "https://darshgobus.baby"
+    "https://darshgobus.baby",
+    "https://'54.159.120.214"
 ]
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URL = [
