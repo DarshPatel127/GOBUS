@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Q
 from .models import busdetails, Booking, Wallet, Passenger, BusStop,RunningDay
 class Busadmin(admin.ModelAdmin):
     list_display = ['bus_name', 'busadmin']
@@ -22,6 +23,11 @@ class BusStopadmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return data
         return data.filter(bus__busadmin=request.user)
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "bus":
+            kwargs["queryset"] = busdetails.objects.filter(busadmin=request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if not obj.bus.busadmin:
@@ -36,7 +42,17 @@ class Bookingadmin(admin.ModelAdmin):
         data = super().get_queryset(request)
         if request.user.is_superuser:
             return data
-        return data.filter(bus__busadmin=request.user)
+        return data.filter(
+            Q(source_stop__bus__busadmin=request.user) |
+            Q(destination_stop__bus__busadmin=request.user)
+        )
+                           
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name in ['source_stop','destination_stop']:
+            kwargs["queryset"] = BusStop.objects.filter(bus__busadmin=request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     
     def save_model(self, request, obj, form, change):
         if not obj.bus.busadmin:
@@ -52,6 +68,11 @@ class Passengeradmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return data
         return data.filter(booking__bus__busadmin=request.user)
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "booking":
+            kwargs["queryset"] = Booking.objects.filter(bus__busadmin=request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     
     def save_model(self, request, obj, form, change):
         if not obj.booking.bus.busadmin:

@@ -189,8 +189,9 @@ SECURE_HSTS_PRELOAD = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://www.darshgobus.baby",
-    "https://darshgobus.baby",
+    "https://darshgobus.baby"
     "https://'54.159.120.214"
+
 ]
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URL = [
