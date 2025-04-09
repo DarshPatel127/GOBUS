@@ -7,7 +7,7 @@ class Busadminsite(admin.AdminSite):
     site_title = "Bus Admin Portal"
     index_title = "Welcome to Bus Admin Portal"
     def has_permission(self, request):
-        return request.user.is_superuser or request.user.is_busadmin
+        return request.user.is_authenticated and (request.user.is_superuser or request.user.is_busadmin)
     
 busadmin_site = Busadminsite(name='busadmin')
 
@@ -55,8 +55,10 @@ class Bookingadmin(admin.ModelAdmin):
                            
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name in ['bus','source_stop','destination_stop']:
+        if db_field.name in ['source_stop','destination_stop']:
             kwargs["queryset"] = BusStop.objects.filter(bus__busadmin=request.user)
+        if db_field.name == "bus":
+            kwargs["queryset"] = busdetails.objects.filter(busadmin=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_model(self, request, obj, form, change):
