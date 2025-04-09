@@ -15,6 +15,15 @@ class Busadmin(admin.ModelAdmin):
         obj.busadmin = request.user
         obj.save()
 
+    def has_add_permission(self, request):
+        if request.user.is_superuser or request.user.is_busadmin :
+            return True
+    
+    def has_change_permission(self, request, obj=None):
+        if obj and not request.user.is_superuser:
+            return obj.busadmin == request.user
+        return True
+
 class BusStopadmin(admin.ModelAdmin):
     list_display = list_display = ['bus', 'stop_name', 'stop_number']
 
@@ -45,11 +54,10 @@ class Bookingadmin(admin.ModelAdmin):
         return data.filter(
             Q(source_stop__bus__busadmin=request.user) |
             Q(destination_stop__bus__busadmin=request.user)
-        )
-                           
+        )                           
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name in ['source_stop','destination_stop']:
+        if db_field.name in ['bus','source_stop','destination_stop']:
             kwargs["queryset"] = BusStop.objects.filter(bus__busadmin=request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 

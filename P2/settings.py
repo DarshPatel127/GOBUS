@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = True
 
 
-SITE_ID = 3
+SITE_ID = 100
 INSTALLED_APPS = [
     'CustomUser.apps.CustomuserConfig',
     'exp.apps.ExpConfig',
