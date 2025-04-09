@@ -20,9 +20,11 @@ from django.urls import path, include
 from django.shortcuts import redirect
 from users import views as user_views
 from users.views import send_otp, verify_otp
+from exp.busadmin import busadmin_site
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('busadmin/', busadmin_site.urls),
     path('', include('exp.urls')),
     path('register/', user_views.register, name="register"),
     path('profile/', user_views.profile, name="profile"),
