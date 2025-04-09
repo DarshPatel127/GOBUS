@@ -55,7 +55,7 @@ class Bookingadmin(admin.ModelAdmin):
                            
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name in ['bus','source_stop','destination_stop']:
+        if db_field.name in ['source_stop','destination_stop']:
             kwargs["queryset"] = BusStop.objects.filter(bus__busadmin=request.user)
         if db_field.name == "bus":
             kwargs["queryset"] = busdetails.objects.filter(busadmin=request.user)
