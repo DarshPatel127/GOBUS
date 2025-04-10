@@ -101,11 +101,12 @@ def book(request, bus_id):
             initial_data['destination_stop'] = destination_stop_id
         form = BookingForm(bus=bus, initial=initial_data or None)
         formset= PassengerFormSet()
-    if request.method == 'POST':
+    elif request.method == 'POST':
         form = BookingForm(request.POST, bus=bus)
         no_of_seats = int(request.POST.get('no_of_seats', 0))
         PassengerFormSet = modelformset_factory(Passenger, form=PassengerForms, extra=no_of_seats)
         formset = PassengerFormSet(request.POST)
+
         if form.is_valid() and formset.is_valid():
             source_stop_id = request.POST.get('source_stop')
             destination_stop_id = request.POST.get('destination_stop')
@@ -157,10 +158,6 @@ def book(request, bus_id):
 
         else:
             messages.error(request, "Please correct the errors below.")
-    else:
-        form = BookingForm(bus=bus)
-        PassengerFormSet = formset_factory(PassengerForms, extra=0)
-
     return render(request, 'exp/booking_page.html', {
         'booking_form': form,
         'bus': bus,
