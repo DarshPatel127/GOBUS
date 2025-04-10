@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db.models import Q
 from .models import busdetails, Booking, Wallet, Passenger, BusStop,RunningDay
+from CustomUser.models import CustomUser
 
 class Busadminsite(admin.AdminSite):
     site_header = "Bus Admin"
@@ -55,6 +56,8 @@ class Bookingadmin(admin.ModelAdmin):
                            
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "name":
+            kwargs["queryset"] = CustomUser.objects.filter(bookings__bus__busadmin=request.user)
         if db_field.name in ['source_stop','destination_stop']:
             kwargs["queryset"] = BusStop.objects.filter(bus__busadmin=request.user)
         if db_field.name == "bus":

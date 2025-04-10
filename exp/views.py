@@ -38,7 +38,9 @@ def search_results(request):
             source_stop = stops.filter(stop_name__icontains = from_query).first()
             destination_stop = stops.filter(stop_name__icontains=to_query).first()
 
-            if source_stop and destination_stop:
+
+
+            if source_stop and destination_stop and source_stop.stop_number < destination_stop.stop_number:
                 occupied_seats = get_occupied_seats(
                     bus,
                     source_stop.stop_number,
@@ -52,6 +54,8 @@ def search_results(request):
                         'bus_number': bus.bus_number,
                         'source_stop': source_stop.stop_name,
                         'destination_stop': destination_stop.stop_name,
+                        'souce_stop_id': source_stop.id,
+                        'destination_stop_id': destination_stop.id,
                         'available_seats': available_seats,
                         'source_arrival_time':source_stop.arrival_time,
                         'destination_arrival_time': destination_stop.arrival_time,
@@ -87,6 +91,16 @@ def book(request, bus_id):
     PassengerFormSet = formset_factory(PassengerForms, extra=0)
     formset = PassengerFormSet()
 
+    if request.method == 'GET':
+        source_stop_id = request.GET.get('source_stop')
+        destination_stop_id = request.GET.get('destination_stop')
+        initial_data = {}
+        if source_stop_id:
+            initial_data['source_stop'] = source_stop_id
+        if destination_stop_id:
+            initial_data['destination_stop'] = destination_stop_id
+        form = BookingForm(bus=bus, initial=initial_data or None)
+        formset= PassengerFormSet()
     if request.method == 'POST':
         form = BookingForm(request.POST, bus=bus)
         no_of_seats = int(request.POST.get('no_of_seats', 0))
