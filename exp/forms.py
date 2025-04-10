@@ -21,4 +21,3 @@ class PassengerForms(forms.ModelForm):
     class Meta:
         model = Passenger
         fields = ['name', 'age','gender']
- 

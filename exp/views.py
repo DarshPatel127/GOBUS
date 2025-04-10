@@ -38,8 +38,6 @@ def search_results(request):
             source_stop = stops.filter(stop_name__icontains = from_query).first()
             destination_stop = stops.filter(stop_name__icontains=to_query).first()
 
-
-
             if source_stop and destination_stop and source_stop.stop_number < destination_stop.stop_number:
                 occupied_seats = get_occupied_seats(
                     bus,

@@ -24,4 +24,4 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = ['image']
 
 class AddFundsForm(forms.Form):
-    amount = forms.IntegerField(label='Amount to Add')
+      amount = forms.IntegerField(min_value=1, max_value=10000000, label="ADD AMOUNT")
