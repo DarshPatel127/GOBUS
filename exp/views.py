@@ -52,6 +52,8 @@ def search_results(request):
                         'bus_number': bus.bus_number,
                         'source_stop': source_stop.stop_name,
                         'destination_stop': destination_stop.stop_name,
+                        'souce_stop_id': source_stop.id,
+                        'destination_stop_id': destination_stop.id,
                         'available_seats': available_seats,
                         'source_arrival_time':source_stop.arrival_time,
                         'destination_arrival_time': destination_stop.arrival_time,

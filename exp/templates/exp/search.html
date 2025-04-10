@@ -14,7 +14,7 @@
             <p class="article-content">Arrival Time: {{ bus_info.destination_arrival_time}}</p>
             <p class="article-content">Fare: {{ bus_info.fare }}</p>
             <p class="article-content">Available Seats: {{ bus_info.available_seats }}</p>
-            <a href="{% url 'booking_page' bus_id %}" class="btn btn-primary">Book</a>
+            <a href="{% url 'booking_page' bus_id %}?source_stop={{ bus_info.source_stop_id }}&destination_stop={{ bus_info.destination_stop_id }}" class="btn btn-primary">Book</a>
         </div>
     </article>
 {% empty %}
