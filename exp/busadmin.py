@@ -21,7 +21,7 @@ class Busadmin(admin.ModelAdmin):
         return data.filter(busadmin=request.user)
     
     def save_model(self, request, obj, form, change):
-        if not obj.busadmin:
+        if not getattr(obj, 'busadmin_id', None):
             obj.busadmin = request.user
         super().save_model(request, obj, form, change)
     
