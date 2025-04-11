@@ -14,7 +14,7 @@ busadmin_site = Busadminsite(name='busadmin')
 
 class Busadmin(admin.ModelAdmin):
     list_display = ['bus_name', 'busadmin']
-    readonly_fields = ['busadmin']
+    exclude = ['busadmin'] 
     
     def get_queryset(self, request):
         data = super().get_queryset(request)
