@@ -65,7 +65,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-SOCIALACCOUNT_ADAPTER = 'users.adapters.MySocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
