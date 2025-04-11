@@ -11,6 +11,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         user.set_unusable_password()
         user.email = sociallogin.account.extra_data.get('email', '')
         user.is_busadmin = False 
+        user.save()
         return user
 
     def get_login_redirect_url(self, request):
