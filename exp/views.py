@@ -60,7 +60,7 @@ def search_results(request):
                         'fare': destination_stop.fare_from_start - source_stop.fare_from_start
                     }
 
-        available_buses = dict(sorted(available_buses.items(), key=lambda x: x[1]['source_stop'], reverse=True))
+
     return render(request, 'exp/search.html',{'from_query': from_query, 'to_query': to_query, 'available_buses':available_buses})
 
 def get_occupied_seats(bus, start_stop, end_stop):
@@ -204,7 +204,7 @@ def edit_passenger_details(request, booking_id):
         if formset.is_valid():
             formset.save()
             messages.success(request, "Passenger details updated successfully.")
-            return redirect('EXP HOME')  # Adjust as needed
+            return redirect('EXP HOME') 
     else:
         formset = PassengerFormSet(queryset=queryset)
 

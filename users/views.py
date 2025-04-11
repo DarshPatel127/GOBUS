@@ -65,7 +65,7 @@ def send_otp(request):
     profile = request.user.profile
     profile.generate_and_send_otp()
     messages.info(request, "An OTP has been sent to your registered email address.")
-    return redirect('otp_verification')  # Redirect to the OTP verification page
+    return redirect('otp_verification')  
 
 @login_required
 def verify_otp(request):
