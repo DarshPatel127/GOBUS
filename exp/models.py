@@ -77,10 +77,6 @@ class Booking(models.Model):
     destination_stop = models.ForeignKey(BusStop, on_delete=models.CASCADE, related_name='bookings_to',null=True)
     is_cancelled = models.BooleanField(default=False)
 
-    @property
-    def email(self):
-        return self.name.email
-
     def calculate_far(self):
         return self.destination_stop.fare_from_start - self.source_stop.fare_from_start
 

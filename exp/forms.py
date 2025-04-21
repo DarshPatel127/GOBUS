@@ -14,7 +14,6 @@ class BookingForm(forms.ModelForm):
             self.fields['source_stop'].queryset = bus.stops.all()
             self.fields['destination_stop'].queryset = bus.stops.all()
 
-
 class PassengerForms(forms.ModelForm):
     class Meta:
         model = Passenger
