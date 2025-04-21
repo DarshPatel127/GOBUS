@@ -48,8 +48,6 @@ class busdetails(models.Model):
             booking.save()
         super(busdetails, self).delete(*args, **kwargs)
 
-
-
 class BusStop(models.Model):
     bus = models.ForeignKey(busdetails, on_delete=models.CASCADE, related_name='stops')
     stop_name = models.CharField(max_length=50)
@@ -103,7 +101,9 @@ class Passenger(models.Model):
     def __str__(self):
         return f'{self.name} in {self.booking.bus}'
 
-
 class Wallet(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     balance = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.user.username} - Wallet'

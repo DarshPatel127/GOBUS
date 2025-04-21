@@ -144,8 +144,6 @@ def book(request, bus_id):
                             passenger.booking = booking
                             passenger.save()
 
-
-
                     messages.success(request, f"Successfully booked {no_of_seats} tickets")
                     return redirect('EXP HOME')
                 else:
@@ -167,7 +165,6 @@ def book(request, bus_id):
 @login_required
 def booking_panel(request):
     booked_tickets = Booking.objects.filter(name=request.user).select_related('bus').order_by('-date')
-
     context = {'booked_tickets': booked_tickets}
     return render(request, 'exp/view_bookings.html', context)
 

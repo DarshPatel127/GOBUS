@@ -36,7 +36,6 @@ services:
     restart: always
     ports:
       - "8080:80"
-      - "8443:443"
     volumes:
       - gobus_static_volume:/app/staticfiles
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro

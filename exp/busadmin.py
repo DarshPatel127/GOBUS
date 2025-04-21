@@ -42,7 +42,7 @@ class BusStopadmin(admin.ModelAdmin):
         if not obj.bus.busadmin:
             obj.bus.busadmin = request.user
             obj.bus.save()
-        obj.save()
+        super().save_model(request, obj, form, change)
 
 class Bookingadmin(admin.ModelAdmin):
     list_display = ['name', 'date', 'no_of_seats', 'bus', 'source_stop', 'destination_stop', 'is_cancelled']
@@ -68,7 +68,7 @@ class Bookingadmin(admin.ModelAdmin):
         if not obj.bus.busadmin:
             obj.bus.busadmin = request.user
             obj.bus.save()
-        obj.save()
+        super().save_model(request, obj, form, change)
 
 class Passengeradmin(admin.ModelAdmin):
     list_display = ['name', 'age', 'gender']
@@ -86,7 +86,7 @@ class Passengeradmin(admin.ModelAdmin):
         if not obj.booking.bus.busadmin:
             obj.booking.bus.busadmin = request.user
             obj.booking.bus.save()
-        obj.save()
+        super().save_model(request, obj, form, change)
 
 busadmin_site.register(busdetails, Busadmin)
 busadmin_site.register(Booking, Bookingadmin)

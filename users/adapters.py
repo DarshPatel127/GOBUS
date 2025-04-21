@@ -7,3 +7,4 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
     def get_signup_redirect_url(self, request):
         return resolve_url('/profile/')
+    
