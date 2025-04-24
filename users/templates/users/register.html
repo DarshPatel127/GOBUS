@@ -29,17 +29,6 @@
             </div>
           </form>
           
-          {% if 'socialaccount' in INSTALLED_APPS %}
-          <div class="text-center my-3">
-            <small class="text-muted">OR</small>
-          </div>
-          
-          <div class="d-grid gap-2">
-            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-danger">
-              <i class="fab fa-google me-2"></i>Register with Google
-            </a>
-          </div>
-          {% endif %}
         </div>
       </div>
       
