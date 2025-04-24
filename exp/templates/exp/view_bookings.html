@@ -69,25 +69,37 @@
             
             <div class="row g-2">
               <div class="col-6">
-                <div class="p-2 border rounded mb-2">
-                  <p class="mb-0 small fw-bold">SEATS</p>
-                  <p class="mb-0">
-                    <i class="fas fa-chair me-1 text-primary"></i>
-                    {{ booked_ticket.no_of_seats }}
-                  </p>
+                <div class="card shadow-sm mb-2">
+                  <div class="card-body p-2">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-light rounded-circle p-2 me-2">
+                        <i class="fas fa-chair text-primary"></i>
+                      </div>
+                      <div>
+                        <div class="small text-uppercase fw-bold text-muted">SEATS</div>
+                        <div class="h5 mb-0">{{ booked_ticket.no_of_seats }}</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+              
               <div class="col-6">
-                <div class="p-2 border rounded mb-2">
-                  <p class="mb-0 small fw-bold">FARE</p>
-                  <p class="mb-0">
-                    <i class="fas fa-rupee-sign me-1 text-primary"></i>
-                    {{ booked_ticket.total_fare }}
-                  </p>
+                <div class="card shadow-sm mb-2">
+                  <div class="card-body p-2">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-light rounded-circle p-2 me-2">
+                        <i class="fas fa-rupee-sign text-primary"></i>
+                      </div>
+                      <div>
+                        <div class="small text-uppercase fw-bold text-muted">FARE</div>
+                        <div class="h5 mb-0">{{ booked_ticket.total_fare }}</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
           <div class="card-footer bg-white">
             <div class="d-flex justify-content-between align-items-center">
