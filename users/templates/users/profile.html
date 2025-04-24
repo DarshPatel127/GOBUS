@@ -1,37 +1,95 @@
 {% extends "exp/base.html" %}
 {% load crispy_forms_tags %}
+
+{% block title %}My Profile - GoBus{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">My Profile</li>
+{% endblock %}
+
 {% block content %}
-    <div class="content-section">
-        <div class="media">
-            <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
-            <div class="media-body">
-                <h2 class="account-heading">{{ user.username }}</h2>
-                <p class="text-secondary">{{ user.email }}</p>
+<div class="container mt-4">
+  <h2 class="mb-4">
+    <i class="fas fa-user-circle me-2 text-primary"></i>My Profile
+  </h2>
+
+  <div class="row">
+    <!-- User Info Card -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <img class="rounded-circle mb-3" width="150" height="150" src="{{ user.profile.image.url }}" alt="{{ user.username }}'s Profile Picture">
+          <h3 class="account-heading">{{ user.username }}</h3>
+          <p class="text-muted">{{ user.email }}</p>
+          
+          <!-- Email Verification Status -->
+          {% if not user.profile.email_verified %}
+            <div class="alert alert-warning mt-3">
+              <p class="mb-2">Your email is not verified.</p>
+              <a href="{% url 'send_otp' %}" class="btn btn-sm btn-info">
+                <i class="fas fa-envelope me-1"></i> Send OTP
+              </a>
             </div>
+          {% else %}
+            <div class="alert alert-success mt-3">
+              <i class="fas fa-check-circle me-1"></i> Email Verified
+            </div>
+          {% endif %}
+          
+          <!-- Wallet Information -->
+          <div class="card mt-3">
+            <div class="card-header bg-light">
+              <h5 class="mb-0">
+                <i class="fas fa-wallet me-2"></i>Wallet Information
+              </h5>
+            </div>
+            <div class="card-body">
+              <h3 class="text-primary mb-3">₹{{ wallet.balance }}</h3>
+              
+              <!-- Add Funds Form -->
+              <form method="POST">
+                {% csrf_token %}
+                {{ add_funds_form|crispy }}
+                <button type="submit" name="add_funds" class="btn btn-success mt-2">
+                  <i class="fas fa-plus-circle me-1"></i> Add Funds
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-        <form method="POST" enctype="multipart/form-data">
+      </div>
+    </div>
+    
+    <!-- Profile Update Form Card -->
+    <div class="col-md-8 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-user-edit me-2"></i>Update Profile
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">PROFILE INFO</legend>
-                {{ u_form|crispy }}
-                {{ p_form|crispy }}
+              <legend class="border-bottom mb-4">Profile Information</legend>
+              {{ u_form|crispy }}
             </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">UPDATE !!!</button>
+            
+            <fieldset class="form-group">
+              <legend class="border-bottom mb-4">Profile Picture</legend>
+              {{ p_form|crispy }}
+            </fieldset>
+            
+            <div class="form-group d-grid mt-4">
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-save me-1"></i> Update Profile
+              </button>
             </div>
-        </form>
-        <h3>Wallet Information</h3>
-        <p><strong>Current Balance:</strong> ₹{{ wallet.balance }}</p>
-
-        <h4>Add Funds</h4>
-        <form method="POST">
-            {% csrf_token %}
-            {{ add_funds_form|crispy }}
-            <button type="submit" name="add_funds" class="btn btn-success">Add Funds</button>
-        </form>
-        {% if not user.profile.email_verified %}
-            <p>Your email is not verified. Click the button below to send an OTP to your email.</p>
-            <a href="{% url 'send_otp' %}" class="btn btn-info">Send OTP</a>
-        {% endif %}
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
 {% endblock content %}
