@@ -8,7 +8,7 @@
 
 {% block content %}
 <h2 class="mb-4">
-  <i class="fas fa-search mr-2 text-primary"></i>
+  <i class="fas fa-search me-2 text-primary"></i>
   Search Results for "{{ from_query }} to {{ to_query }}"
 </h2>
 
@@ -16,50 +16,64 @@
   <div class="row">
     {% for bus_id, bus_info in available_buses.items %}
     <div class="col-md-6 mb-4">
-        <div class="card shadow-sm h-100">
+      <div class="card shadow-sm h-100">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
-            <h4 class="mb-0">{{ bus_info.bus_name }}</h4>
-            <small class="text-muted">Bus No: {{ bus_info.bus_number }}</small>
+              <h4 class="mb-0">{{ bus_info.bus_name }}</h4>
+              <small class="text-muted">Bus No: {{ bus_info.bus_number }}</small>
             </div>
             <span class="badge bg-primary p-2">
-            <i class="fas fa-rupee-sign me-1"></i>{{ bus_info.fare }}
+              <i class="fas fa-rupee-sign me-1"></i>{{ bus_info.fare }}
             </span>
         </div>
-        <div class="row g-2">
-            <div class="col-md-6">
-                <div class="p-2 border rounded mb-2">
-                    <p class="mb-0 small fw-bold">DEPARTURE</p>
-                    <p class="mb-0">
-                        <i class="fas fa-clock me-1 text-primary"></i>
-                        {{ bus_info.source_arrival_time|date:"g:i A" }}
-                    </p>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="p-2 border rounded mb-2">
-                    <p class="mb-0 small fw-bold">ARRIVAL</p>
-                    <p class="mb-0">
-                        <i class="fas fa-clock me-1 text-primary"></i>
-                        {{ bus_info.destination_arrival_time|date:"g:i A" }}
-                    </p>
-                </div>
-            </div>
-        </div>
         
-        <div class="alert alert-success p-2 mt-2">
+        <div class="card-body">
+          <!-- Route information -->
+          <h5 class="mb-3">
+            <i class="fas fa-route me-2"></i>
+            <span class="text-truncate d-inline-block" style="max-width: 80%;">
+              {{ bus_info.source_stop }}
+              <i class="fas fa-arrow-right mx-2"></i>
+              {{ bus_info.destination_stop }}
+            </span>
+          </h5>
+          
+          <!-- Departure & Arrival -->
+          <div class="row g-2">
+            <div class="col-md-6">
+              <div class="p-2 border rounded mb-2">
+                <p class="mb-0 small fw-bold">DEPARTURE</p>
+                <p class="mb-0">
+                  <i class="fas fa-clock me-1 text-primary"></i>
+                  {{ bus_info.source_arrival_time|date:"g:i A" }}
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-2 border rounded mb-2">
+                <p class="mb-0 small fw-bold">ARRIVAL</p>
+                <p class="mb-0">
+                  <i class="fas fa-clock me-1 text-primary"></i>
+                  {{ bus_info.destination_arrival_time|date:"g:i A" }}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Available seats -->
+          <div class="alert alert-success p-2 mt-2">
             <i class="fas fa-chair me-2"></i>
             <strong>{{ bus_info.available_seats }}</strong> seats available
+          </div>
         </div>
-    </div>
         
         <div class="card-footer bg-white d-flex justify-content-end">
-            <a href="{% url 'booking_page' bus_id %}?source_stop={{ bus_info.source_stop_id }}&destination_stop={{ bus_info.destination_stop_id }}" 
-            class="btn btn-primary">
+          <a href="{% url 'booking_page' bus_id %}?source_stop={{ bus_info.source_stop_id }}&destination_stop={{ bus_info.destination_stop_id }}" 
+             class="btn btn-primary">
             <i class="fas fa-ticket-alt me-2"></i>Book Now
-            </a>
+          </a>
         </div>
-        </div>
+      </div>
     </div>
     {% endfor %}
   </div>
@@ -69,7 +83,7 @@
     <h4>No buses found for this route</h4>
     <p class="text-muted">Try searching with different locations or dates</p>
     <a href="/" class="btn btn-primary">
-      <i class="fas fa-search mr-2"></i>Search Again
+      <i class="fas fa-search me-2"></i>Search Again
     </a>
   </div>
 {% endif %}
