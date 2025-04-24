@@ -1,40 +1,61 @@
 {% extends "exp/base.html" %}
 {% load crispy_forms_tags %}
 
+{% block title %}Book Bus: {{ bus.bus_name }} - GoBus{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'search_results' %}">Search</a></li>
+<li class="breadcrumb-item active" aria-current="page">Book Bus</li>
+{% endblock %}
+
 {% block content %}
-<div class="mt-5">
-    <h1>Book Bus: {{ bus.bus_name }}</h1>
-    <form method="post">
-        {% csrf_token %}
-        
-        <!-- Booking Form -->
-        <h2>Booking Details</h2>
-        {{ booking_form|crispy }}
+<div class="container mt-4">
+    <h1 class="mb-4">
+        <i class="fas fa-ticket-alt mr-2 text-primary"></i>Book Bus: {{ bus.bus_name }}
+    </h1>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Booking Form -->
+                <h2 class="h4 mb-4">Booking Details</h2>
+                {{ booking_form|crispy }}
 
-        <!-- Passenger Forms -->
-        <h2>Passenger Details</h2>
-        {{ passenger_formset.management_form|crispy }}
-        <div id="passenger-forms">
-            {% for form in passenger_formset %}
-                <div class="card mb-3 passenger-form">
-                    <div class="card-body">
-                        {{ form|crispy }}
-                    </div>
+                <!-- Passenger Forms -->
+                <h2 class="h4 mb-3 mt-4">Passenger Details</h2>
+                {{ passenger_formset.management_form|crispy }}
+                <div id="passenger-forms">
+                    {% for form in passenger_formset %}
+                        <div class="card mb-3 passenger-form">
+                            <div class="card-body">
+                                {{ form|crispy }}
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+
+                <div class="mt-4">
+                    <!-- Add Passenger Button -->
+                    <button type="button" id="add-passenger" class="btn btn-secondary mb-3">
+                        <i class="fas fa-user-plus mr-1"></i> Add Passenger
+                    </button>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary mb-3" id="confirm-booking" disabled>
+                        <i class="fas fa-check-circle mr-1"></i> Confirm Booking
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <!-- Add Passenger Button -->
-        <button type="button" id="add-passenger" class="btn btn-secondary mb-3">Add Passenger</button>
-
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary" id="confirm-booking" disabled>Confirm Booking</button>
-    </form>
+    </div>
 </div>
 
 <!-- JavaScript for Dynamic Forms -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Your existing JavaScript code is good, no changes needed here
         const passengerFormsContainer = document.getElementById('passenger-forms');
         const addPassengerButton = document.getElementById('add-passenger');
         const confirmBookingButton = document.getElementById('confirm-booking');

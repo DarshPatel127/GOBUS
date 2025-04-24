@@ -1,23 +1,81 @@
 {% extends "exp/base.html" %}
-{% block content %}
-<h2>Search Results for "{{ from_query }} to {{ to_query }}"</h2>
+{% block title %}Search Results - GoBus{% endblock %}
 
-{% for bus_id, bus_info in available_buses.items %}
-    <article class="media content-section">
-        <div class="media-body">
-            <div class="article-metadata">
-                <a class="mr-2" href="#">{{ bus_info.bus_name }}</a>
-                <small class="text-muted">{{ bus_info.bus_number }}</small>
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'search_results' %}">Search Buses</a></li>
+<li class="breadcrumb-item active" aria-current="page">Results</li>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+  <i class="fas fa-search mr-2 text-primary"></i>
+  Search Results for "{{ from_query }} to {{ to_query }}"
+</h2>
+
+{% if available_buses %}
+  <div class="row">
+    {% for bus_id, bus_info in available_buses.items %}
+      <div class="col-md-6 mb-4">
+        <article class="media content-section booking-card">
+          <div class="media-body">
+            <div class="article-metadata d-flex justify-content-between align-items-center">
+              <div>
+                <h4 class="mb-0">{{ bus_info.bus_name }}</h4>
+                <small class="text-muted">Bus No: {{ bus_info.bus_number }}</small>
+              </div>
+              <span class="badge badge-primary p-2">
+                <i class="fas fa-rupee-sign mr-1"></i>{{ bus_info.fare }}
+              </span>
             </div>
-            <h2 class="article-title">from {{ bus_info.source_stop }} to {{ bus_info.destination_stop }}</h2>
-            <p class="article-content"> Departure Time: {{ bus_info.source_arrival_time }}</p>
-            <p class="article-content">Arrival Time: {{ bus_info.destination_arrival_time}}</p>
-            <p class="article-content">Fare: {{ bus_info.fare }}</p>
-            <p class="article-content">Available Seats: {{ bus_info.available_seats }}</p>
-            <a href="{% url 'booking_page' bus_id %}?source_stop={{ bus_info.source_stop_id }}&destination_stop={{ bus_info.destination_stop_id }}" class="btn btn-primary">Book</a>
-        </div>
-    </article>
-{% empty %}
-    <p>No buses found.</p>
-{% endfor %}
+
+            <div class="my-3">
+              <h5 class="mb-3">
+                <i class="fas fa-route mr-2"></i>
+                {{ bus_info.source_stop }} 
+                <i class="fas fa-arrow-right mx-2"></i> 
+                {{ bus_info.destination_stop }}
+              </h5>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <p class="mb-2">
+                    <i class="fas fa-arrow-circle-right mr-2"></i>
+                    <strong>Departure:</strong> {{ bus_info.source_arrival_time }}
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <p class="mb-2">
+                    <i class="fas fa-arrow-circle-left mr-2"></i>
+                    <strong>Arrival:</strong> {{ bus_info.destination_arrival_time }}
+                  </p>
+                </div>
+              </div>
+              
+              <div class="alert alert-success p-2 mt-2">
+                <i class="fas fa-chair mr-2"></i>
+                <strong>{{ bus_info.available_seats }}</strong> seats available
+              </div>
+            </div>
+
+            <div class="text-right">
+              <a href="{% url 'booking_page' bus_id %}?source_stop={{ bus_info.source_stop_id }}&destination_stop={{ bus_info.destination_stop_id }}" 
+                 class="btn btn-primary">
+                <i class="fas fa-ticket-alt mr-2"></i>Book Now
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-5">
+    <i class="fas fa-bus-slash fa-4x text-muted mb-4"></i>
+    <h4>No buses found for this route</h4>
+    <p class="text-muted">Try searching with different locations or dates</p>
+    <a href="/" class="btn btn-primary">
+      <i class="fas fa-search mr-2"></i>Search Again
+    </a>
+  </div>
+{% endif %}
 {% endblock %}

@@ -1,21 +1,91 @@
 {% extends "exp/base.html" %}
+{% block title %}My Bookings - GoBus{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">My Bookings</li>
+{% endblock %}
+
 {% block content %}
-       {% for booked_ticket  in booked_tickets %}
-              <article class="media content-section">
-              <div class="media-body">
-                <div class="article-metadata">
-                  <a class="mr-2" href="#">{{booked_ticket.bus.bus_name }}</a>
-                  <small class="text-muted">{{ booked_ticket.bus_number }}</small>
-                </div>
-                <h2><a class="article-title" href="#">From {{booked_ticket.source_stop.stop_name}} To {{booked_ticket.destination_stop.stop_name}}</a></h2>
-                <p class="article-content">Date & Time: {{ booked_ticket.bus.date_time }}</p>
-                <p class="article-content">Number of seats: {{ booked_ticket.no_of_seats }}</p>
-                  <p class="article-content">Cancellation status: {{ booked_ticket.is_cancelled }}</p>
-                  {% if not booked_ticket.is_cancelled %}
-                     <a href = "{% url 'cancel_booking' booked_ticket.id %}" class="chutiyaBtn">Cancel</a>
-                  {% endif %}
-                  <a class="chutiyaBtn" href="{% url 'edit_passengers' booked_ticket.id %}">Edit Passenger Details</a>
+<h2 class="mb-4">
+  <i class="fas fa-ticket-alt mr-2 text-primary"></i>My Bookings
+</h2>
+
+{% if booked_tickets %}
+  <div class="row">
+    {% for booked_ticket in booked_tickets %}
+      <div class="col-md-6 mb-4">
+        <article class="media content-section booking-card {% if booked_ticket.is_cancelled %}cancelled-booking{% endif %}">
+          <div class="media-body">
+            <div class="article-metadata d-flex justify-content-between align-items-center">
+              <div>
+                <h4 class="mb-0">{{ booked_ticket.bus.bus_name }}</h4>
+                <small class="text-muted">Booking ID: {{ booked_ticket.id }}</small>
               </div>
-            </article>
-       {% endfor %}
+              <span class="badge {% if booked_ticket.is_cancelled %}badge-danger{% else %}badge-success{% endif %} p-2">
+                {% if booked_ticket.is_cancelled %}Cancelled{% else %}Confirmed{% endif %}
+              </span>
+            </div>
+
+            <div class="my-3">
+              <h5 class="mb-3">
+                <i class="fas fa-route mr-2"></i>
+                {{ booked_ticket.source_stop.stop_name }} 
+                <i class="fas fa-arrow-right mx-2"></i> 
+                {{ booked_ticket.destination_stop.stop_name }}
+              </h5>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <p class="mb-2">
+                    <i class="far fa-calendar-alt mr-2"></i>
+                    <strong>Date:</strong> {{ booked_ticket.bus.date_time|date:"D, d M Y" }}
+                  </p>
+                  <p class="mb-2">
+                    <i class="far fa-clock mr-2"></i>
+                    <strong>Time:</strong> {{ booked_ticket.bus.date_time|time:"H:i" }}
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  <p class="mb-2">
+                    <i class="fas fa-chair mr-2"></i>
+                    <strong>Seats:</strong> {{ booked_ticket.no_of_seats }}
+                  </p>
+                  <p class="mb-2">
+                    <i class="fas fa-rupee-sign mr-2"></i>
+                    <strong>Total:</strong> ₹{{ booked_ticket.total_fare }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                Booked on: {{ booked_ticket.booking_date|date:"d M Y, H:i" }}
+              </small>
+              <div>
+                {% if not booked_ticket.is_cancelled %}
+                  <a href="{% url 'cancel_booking' booked_ticket.id %}" class="btn btn-sm btn-outline-danger mr-2">
+                    <i class="fas fa-times-circle mr-1"></i>Cancel
+                  </a>
+                {% endif %}
+                <a href="{% url 'edit_passengers' booked_ticket.id %}" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-user-edit mr-1"></i>Edit Passengers
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-5">
+    <i class="fas fa-ticket-alt fa-4x text-muted mb-4"></i>
+    <h4>No bookings found</h4>
+    <p class="text-muted">You haven't made any bookings yet</p>
+    <a href="{% url 'search_results' %}" class="btn btn-primary">
+      <i class="fas fa-search mr-2"></i>Search Buses
+    </a>
+  </div>
+{% endif %}
 {% endblock %}
