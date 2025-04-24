@@ -67,40 +67,38 @@
               </div>
             </div>
             
-            <div class="row g-2">
-              <div class="col-6">
-                <div class="card shadow-sm mb-2">
-                  <div class="card-body p-2">
-                    <div class="d-flex align-items-center">
-                      <div class="bg-light rounded-circle p-2 me-2">
-                        <i class="fas fa-chair text-primary"></i>
-                      </div>
-                      <div>
-                        <div class="small text-uppercase fw-bold text-muted">SEATS</div>
-                        <div class="h5 mb-0">{{ booked_ticket.no_of_seats }}</div>
-                      </div>
+            <!-- Replace the row with stacked boxes -->
+            <div class="d-flex flex-column gap-2 mb-3">
+              <!-- Seats Box -->
+              <div class="card shadow-sm">
+                <div class="card-body p-2">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-2 me-2">
+                      <i class="fas fa-chair text-primary"></i>
+                    </div>
+                    <div>
+                      <div class="small text-uppercase fw-bold text-muted">SEATS</div>
+                      <div class="h5 mb-0">{{ booked_ticket.no_of_seats }}</div>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div class="col-6">
-                <div class="card shadow-sm mb-2">
-                  <div class="card-body p-2">
-                    <div class="d-flex align-items-center">
-                      <div class="bg-light rounded-circle p-2 me-2">
-                        <i class="fas fa-rupee-sign text-primary"></i>
-                      </div>
-                      <div>
-                        <div class="small text-uppercase fw-bold text-muted">FARE</div>
-                        <div class="h5 mb-0">{{ booked_ticket.total_fare }}</div>
-                      </div>
+              <!-- Fare Box -->
+              <div class="card shadow-sm">
+                <div class="card-body p-2">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-light rounded-circle p-2 me-2">
+                      <i class="fas fa-rupee-sign text-primary"></i>
+                    </div>
+                    <div>
+                      <div class="small text-uppercase fw-bold text-muted">FARE</div>
+                      <div class="h5 mb-0">{{ booked_ticket.total_fare }}</div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-
+          </div>
           <div class="card-footer bg-white">
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">
