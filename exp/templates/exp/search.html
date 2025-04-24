@@ -26,35 +26,32 @@
             <i class="fas fa-rupee-sign me-1"></i>{{ bus_info.fare }}
             </span>
         </div>
-        
-        <div class="card-body">
-            <h5 class="mb-3">
-            <i class="fas fa-route me-2"></i>
-            {{ bus_info.source_stop }} 
-            <i class="fas fa-arrow-right mx-2"></i> 
-            {{ bus_info.destination_stop }}
-            </h5>
-            
-            <div class="row">
+        <div class="row g-2">
             <div class="col-md-6">
-                <p class="mb-2">
-                <i class="fas fa-arrow-circle-right me-2"></i>
-                <strong>Departure:</strong> {{ bus_info.source_arrival_time }}
-                </p>
+                <div class="p-2 border rounded mb-2">
+                    <p class="mb-0 small fw-bold">DEPARTURE</p>
+                    <p class="mb-0">
+                        <i class="fas fa-clock me-1 text-primary"></i>
+                        {{ bus_info.source_arrival_time|date:"g:i A" }}
+                    </p>
+                </div>
             </div>
             <div class="col-md-6">
-                <p class="mb-2">
-                <i class="fas fa-arrow-circle-left me-2"></i>
-                <strong>Arrival:</strong> {{ bus_info.destination_arrival_time }}
-                </p>
-            </div>
-            </div>
-            
-            <div class="alert alert-success p-2 mt-2">
-            <i class="fas fa-chair me-2"></i>
-            <strong>{{ bus_info.available_seats }}</strong> seats available
+                <div class="p-2 border rounded mb-2">
+                    <p class="mb-0 small fw-bold">ARRIVAL</p>
+                    <p class="mb-0">
+                        <i class="fas fa-clock me-1 text-primary"></i>
+                        {{ bus_info.destination_arrival_time|date:"g:i A" }}
+                    </p>
+                </div>
             </div>
         </div>
+        
+        <div class="alert alert-success p-2 mt-2">
+            <i class="fas fa-chair me-2"></i>
+            <strong>{{ bus_info.available_seats }}</strong> seats available
+        </div>
+    </div>
         
         <div class="card-footer bg-white d-flex justify-content-end">
             <a href="{% url 'booking_page' bus_id %}?source_stop={{ bus_info.source_stop_id }}&destination_stop={{ bus_info.destination_stop_id }}" 
