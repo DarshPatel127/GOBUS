@@ -7,74 +7,106 @@
 
 {% block content %}
 <h2 class="mb-4">
-  <i class="fas fa-ticket-alt mr-2 text-primary"></i>My Bookings
+  <i class="fas fa-ticket-alt me-2 text-primary"></i>My Bookings
 </h2>
 
 {% if booked_tickets %}
   <div class="row">
     {% for booked_ticket in booked_tickets %}
       <div class="col-md-6 mb-4">
-        <article class="media content-section booking-card {% if booked_ticket.is_cancelled %}cancelled-booking{% endif %}">
-          <div class="media-body">
-            <div class="article-metadata d-flex justify-content-between align-items-center">
-              <div>
-                <h4 class="mb-0">{{ booked_ticket.bus.bus_name }}</h4>
-                <small class="text-muted">Booking ID: {{ booked_ticket.id }}</small>
-              </div>
-              <span class="badge {% if booked_ticket.is_cancelled %}badge-danger{% else %}badge-success{% endif %} p-2">
-                {% if booked_ticket.is_cancelled %}Cancelled{% else %}Confirmed{% endif %}
-              </span>
+        <div class="card shadow-sm h-100 {% if booked_ticket.is_cancelled %}border-danger{% endif %}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0">{{ booked_ticket.bus.bus_name }}</h4>
+              <small class="text-muted">Booking ID: {{ booked_ticket.id }}</small>
             </div>
+            <span class="badge {% if booked_ticket.is_cancelled %}bg-danger{% else %}bg-success{% endif %} p-2">
+              {% if booked_ticket.is_cancelled %}Cancelled{% else %}Confirmed{% endif %}
+            </span>
+          </div>
 
-            <div class="my-3">
-              <h5 class="mb-3">
-                <i class="fas fa-route mr-2"></i>
+          <div class="card-body">
+            <h5 class="mb-3">
+              <i class="fas fa-route me-2"></i>
+              <span class="text-truncate d-inline-block" style="max-width: 80%;">
                 {{ booked_ticket.source_stop.stop_name }} 
                 <i class="fas fa-arrow-right mx-2"></i> 
                 {{ booked_ticket.destination_stop.stop_name }}
-              </h5>
+              </span>
+            </h5>
+            
+            <!-- Journey Details -->
+            <div class="border rounded p-3 mb-3">
+              <!-- Departure -->
+              <div class="mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="bg-light rounded-circle p-2 me-3">
+                    <i class="fas fa-calendar-day text-primary"></i>
+                  </div>
+                  <div>
+                    <p class="mb-0 small text-uppercase fw-bold text-muted">JOURNEY DATE</p>
+                    <p class="mb-0 h5">{{ booked_ticket.bus.date_time|date:"D, d M Y" }}</p>
+                  </div>
+                </div>
+              </div>
               
-              <div class="row">
-                <div class="col-md-6">
-                  <p class="mb-2">
-                    <i class="far fa-calendar-alt mr-2"></i>
-                    <strong>Date:</strong> {{ booked_ticket.bus.date_time|date:"D, d M Y" }}
-                  </p>
-                  <p class="mb-2">
-                    <i class="far fa-clock mr-2"></i>
-                    <strong>Time:</strong> {{ booked_ticket.bus.date_time|time:"H:i" }}
+              <!-- Divider -->
+              <hr class="my-2">
+              
+              <!-- Time -->
+              <div>
+                <div class="d-flex align-items-center">
+                  <div class="bg-light rounded-circle p-2 me-3">
+                    <i class="fas fa-clock text-primary"></i>
+                  </div>
+                  <div>
+                    <p class="mb-0 small text-uppercase fw-bold text-muted">DEPARTURE TIME</p>
+                    <p class="mb-0 h5">{{ booked_ticket.bus.date_time|time:"H:i" }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="p-2 border rounded mb-2">
+                  <p class="mb-0 small fw-bold">SEATS</p>
+                  <p class="mb-0">
+                    <i class="fas fa-chair me-1 text-primary"></i>
+                    {{ booked_ticket.no_of_seats }}
                   </p>
                 </div>
-                <div class="col-md-6">
-                  <p class="mb-2">
-                    <i class="fas fa-chair mr-2"></i>
-                    <strong>Seats:</strong> {{ booked_ticket.no_of_seats }}
-                  </p>
-                  <p class="mb-2">
-                    <i class="fas fa-rupee-sign mr-2"></i>
-                    <strong>Total:</strong> ₹{{ booked_ticket.total_fare }}
+              </div>
+              <div class="col-6">
+                <div class="p-2 border rounded mb-2">
+                  <p class="mb-0 small fw-bold">FARE</p>
+                  <p class="mb-0">
+                    <i class="fas fa-rupee-sign me-1 text-primary"></i>
+                    {{ booked_ticket.total_fare }}
                   </p>
                 </div>
               </div>
             </div>
+          </div>
 
+          <div class="card-footer bg-white">
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">
-                Booked on: {{ booked_ticket.booking_date|date:"d M Y, H:i" }}
+                Booked: {{ booked_ticket.booking_date|date:"d M Y, H:i" }}
               </small>
               <div>
                 {% if not booked_ticket.is_cancelled %}
-                  <a href="{% url 'cancel_booking' booked_ticket.id %}" class="btn btn-sm btn-outline-danger mr-2">
-                    <i class="fas fa-times-circle mr-1"></i>Cancel
+                  <a href="{% url 'cancel_booking' booked_ticket.id %}" class="btn btn-sm btn-outline-danger me-2">
+                    <i class="fas fa-times-circle me-1"></i>Cancel
                   </a>
                 {% endif %}
                 <a href="{% url 'edit_passengers' booked_ticket.id %}" class="btn btn-sm btn-outline-primary">
-                  <i class="fas fa-user-edit mr-1"></i>Edit Passengers
+                  <i class="fas fa-user-edit me-1"></i>Edit Passengers
                 </a>
               </div>
             </div>
           </div>
-        </article>
+        </div>
       </div>
     {% endfor %}
   </div>
@@ -84,7 +116,7 @@
     <h4>No bookings found</h4>
     <p class="text-muted">You haven't made any bookings yet</p>
     <a href="{% url 'search_results' %}" class="btn btn-primary">
-      <i class="fas fa-search mr-2"></i>Search Buses
+      <i class="fas fa-search me-2"></i>Search Buses
     </a>
   </div>
 {% endif %}
